@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects — SCS Platform</title>
+  <meta name="description" content="Explore the active security projects developed by SCS members.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/reset.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/projects.css">
+  <link rel="stylesheet" href="assets/css/hero.css">
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div id="c-dot"></div>
+  <div id="c-ring"></div>
+
+  <!-- THREE.JS CANVAS -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><span>S</span></div>
+      <span>SCS</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="team.html" class="nav-link">Team</a>
+      <a href="projects.html" class="nav-link active">Projects</a>
+      <a href="events.html" class="nav-link">Events</a>
+      <a href="resources.html" class="nav-link">Resources</a>
+      <a href="terminal.html" class="nav-link">Terminal</a>
+      <a href="join.html" class="nav-link">Join</a>
+    </div>
+    <div class="nav-hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <main>
+    <!-- PROJECTS SECTION -->
+    <section class="projects section">
+      <div class="container">
+        <div class="section-header sr">
+          <span class="section-label">Projects</span>
+          <h2 class="section-title">Active <span class="accent">Developments</span></h2>
+          <span class="section-count">4 projects</span>
+        </div>
+        
+        <div class="projects-grid">
+          <!-- Featured Project -->
+          <div class="project-featured sr d1">
+            <div class="project-featured-info">
+              <div class="project-header">
+                <span class="project-id">OP-001</span>
+                <div class="project-status">
+                  <span class="p-dot p-dot-active"></span>
+                  ACTIVE
+                </div>
+              </div>
+              <h3 class="project-title">DARKSCANNER</h3>
+              <p class="project-desc">
+                AI-assisted vulnerability scanner with 200+ signatures and custom rule engine. 
+                Automated security assessment for web applications. Features include automated 
+                crawling, payload generation, and detailed reporting.
+              </p>
+              <div class="project-stack">
+                <span class="stack-pill">Python</span>
+                <span class="stack-pill">FastAPI</span>
+                <span class="stack-pill">Docker</span>
+                <span class="stack-pill">ML/AI</span>
+              </div>
+              <div class="project-tags">
+                <span class="m-tag mt-d">Exploitation</span>
+                <span class="m-tag mt-a">Open Source</span>
+              </div>
+              <a href="#" class="project-link">
+                View Repository
+                <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
+              </a>
+            </div>
+          </div>
+          
+          <!-- Project Cards -->
+          <div class="projects-grid-full">
+            <!-- Project 2 -->
+            <div class="project-card sr d2">
+              <div class="project-card-header">
+                <span class="project-id">OP-002</span>
+                <div class="project-status">
+                  <span class="p-dot p-dot-active"></span>
+                  ACTIVE
+                </div>
+              </div>
+              <h4 class="project-card-title">SPECTRE-CTF</h4>
+              <p class="project-card-desc">
+                Custom CTF platform with 50+ challenges covering web, binary, crypto, 
+                and forensics categories.
+              </p>
+              <div class="project-stack">
+                <span class="stack-pill">React</span>
+                <span class="stack-pill">Go</span>
+                <span class="stack-pill">Postgres</span>
+                <span class="stack-pill">K8s</span>
+              </div>
+              <div class="project-tags">
+                <span class="m-tag mt-b">Platform</span>
+                <span class="m-tag mt-c">CTF</span>
+              </div>
+            </div>
+            
+            <!-- Project 3 -->
+            <div class="project-card sr d3">
+              <div class="project-card-header">
+                <span class="project-id">OP-003</span>
+                <div class="project-status">
+                  <span class="p-dot p-dot-beta"></span>
+                  BETA
+                </div>
+              </div>
+              <h4 class="project-card-title">NEXUS OSINT</h4>
+              <p class="project-card-desc">
+                OSINT aggregation framework with 40+ data sources and visual 
+                intelligence graphing.
+              </p>
+              <div class="project-stack">
+                <span class="stack-pill">Python</span>
+                <span class="stack-pill">Elasticsearch</span>
+                <span class="stack-pill">D3.js</span>
+              </div>
+              <div class="project-tags">
+                <span class="m-tag mt-e">OSINT</span>
+                <span class="m-tag mt-a">Open Source</span>
+              </div>
+            </div>
+            
+            <!-- Project 4 -->
+            <div class="project-card sr d4">
+              <div class="project-card-header">
+                <span class="project-id">OP-004</span>
+                <div class="project-status">
+                  <span class="p-dot p-dot-active"></span>
+                  ACTIVE
+                </div>
+              </div>
+              <h4 class="project-card-title">MALWARE LAB</h4>
+              <p class="project-card-desc">
+                Sandboxed malware analysis environment with automated IOC 
+                extraction and YARA rule generation.
+              </p>
+              <div class="project-stack">
+                <span class="stack-pill">C++</span>
+                <span class="stack-pill">Python</span>
+                <span class="stack-pill">QEMU</span>
+                <span class="stack-pill">YARA</span>
+              </div>
+              <div class="project-tags">
+                <span class="m-tag mt-d">Malware</span>
+                <span class="m-tag mt-c">RE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="assets/js/particles.js"></script>
+  <script src="assets/js/cursor.js"></script>
+  <script src="assets/js/nav.js"></script>
+  <script src="assets/js/animations.js"></script>
+</body>
+</html>

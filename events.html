@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events — SCS Platform</title>
+  <meta name="description" content="Upcoming and past security events, CTF competitions, and workshops by SCS.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/reset.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/events.css">
+  <link rel="stylesheet" href="assets/css/hero.css">
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div id="c-dot"></div>
+  <div id="c-ring"></div>
+
+  <!-- THREE.JS CANVAS -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><span>S</span></div>
+      <span>SCS</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="team.html" class="nav-link">Team</a>
+      <a href="projects.html" class="nav-link">Projects</a>
+      <a href="events.html" class="nav-link active">Events</a>
+      <a href="resources.html" class="nav-link">Resources</a>
+      <a href="terminal.html" class="nav-link">Terminal</a>
+      <a href="join.html" class="nav-link">Join</a>
+    </div>
+    <div class="nav-hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <main>
+    <!-- EVENTS SECTION -->
+    <section class="events section">
+      <div class="container">
+        <div class="section-header sr">
+          <span class="section-label">Events</span>
+          <h2 class="section-title">Upcoming & <span class="accent">Past</span></h2>
+          <span class="section-count">5 events</span>
+        </div>
+        
+        <div class="events-grid">
+          <!-- Upcoming Events -->
+          <div class="events-category sr d1">
+            <h3>Upcoming Events</h3>
+            <div class="events-track">
+              <div class="event-card">
+                <div class="event-card-header">
+                  <span class="event-number">01</span>
+                  <span class="event-badge upcoming">Upcoming</span>
+                </div>
+                <div class="event-date">APR 15-16, 2024</div>
+                <h4 class="event-title">CTF Championship 2024</h4>
+                <p class="event-desc">
+                  48-hour Capture The Flag competition with $5,000 in prizes. 
+                  Categories include Web, Crypto, Pwn, RE, and Forensics.
+                </p>
+                <div class="event-tags">
+                  <span class="m-tag mt-b">CTF</span>
+                  <span class="m-tag mt-c">48h</span>
+                  <span class="m-tag mt-a">Prizes</span>
+                </div>
+              </div>
+              
+              <div class="event-card">
+                <div class="event-card-header">
+                  <span class="event-number">02</span>
+                  <span class="event-badge upcoming">Upcoming</span>
+                </div>
+                <div class="event-date">MAY 20, 2024</div>
+                <h4 class="event-title">Web Security Workshop</h4>
+                <p class="event-desc">
+                  Hands-on workshop covering modern web vulnerabilities including 
+                  IDOR, SSRF, and deserialization attacks.
+                </p>
+                <div class="event-tags">
+                  <span class="m-tag mt-a">Web Sec</span>
+                  <span class="m-tag mt-e">Workshop</span>
+                </div>
+              </div>
+              
+              <div class="event-card">
+                <div class="event-card-header">
+                  <span class="event-number">03</span>
+                  <span class="event-badge upcoming">Upcoming</span>
+                </div>
+                <div class="event-date">JUN 10-11, 2024</div>
+                <h4 class="event-title">Red Team Ops Training</h4>
+                <p class="event-desc">
+                  Advanced red team operations training covering C2 frameworks, 
+                  lateral movement, and evasion techniques.
+                </p>
+                <div class="event-tags">
+                  <span class="m-tag mt-d">Red Team</span>
+                  <span class="m-tag mt-e">Workshop</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Past Events -->
+          <div class="events-category sr d2">
+            <h3>Completed Events</h3>
+            <div class="events-track">
+              <div class="event-card past">
+                <div class="event-card-header">
+                  <span class="event-number">04</span>
+                  <span class="event-badge completed">Completed</span>
+                </div>
+                <div class="event-date">MAR 01-02, 2024</div>
+                <h4 class="event-title">HackTheBox League</h4>
+                <p class="event-desc">
+                  Team-based penetration testing competition. 32 teams competed 
+                  for top positions.
+                </p>
+                <div class="event-tags">
+                  <span class="m-tag mt-b">CTF</span>
+                  <span class="m-tag mt-b">Online</span>
+                </div>
+              </div>
+              
+              <div class="event-card past">
+                <div class="event-card-header">
+                  <span class="event-number">05</span>
+                  <span class="event-badge completed">Completed</span>
+                </div>
+                <div class="event-date">FEB 15, 2024</div>
+                <h4 class="event-title">Malware Analysis 101</h4>
+                <p class="event-desc">
+                  Introduction to malware analysis techniques, sandboxing, and 
+                  IOC extraction.
+                </p>
+                <div class="event-tags">
+                  <span class="m-tag mt-d">Malware</span>
+                  <span class="m-tag mt-e">Workshop</span>
+                </div>
+              </div>
+              
+              <div class="event-card past">
+                <div class="event-card-header">
+                  <span class="event-number">06</span>
+                  <span class="event-badge completed">Completed</span>
+                </div>
+                <div class="event-date">JAN 20-21, 2024</div>
+                <h4 class="event-title">New Year CTF</h4>
+                <p class="event-desc">
+                  24-hour CTF to start the year. Beginner-friendly challenges 
+                  with prizes for top 3 teams.
+                </p>
+                <div class="event-tags">
+                  <span class="m-tag mt-b">CTF</span>
+                  <span class="m-tag mt-b">Online</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="assets/js/particles.js"></script>
+  <script src="assets/js/cursor.js"></script>
+  <script src="assets/js/nav.js"></script>
+  <script src="assets/js/animations.js"></script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+/* SCS Platform - About / Log Terminal Section - REFINED */
+
+/* ===== ABOUT SECTION ===== */
+.about {
+  position: relative;
+  background: var(--ink2);
+  overflow: hidden;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3xl);
+  align-items: center;
+}
+
+.about-content {
+  max-width: 500px;
+}
+
+.about-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--acid);
+  margin-bottom: var(--space-sm);
+}
+
+.about-label::before {
+  content: '// ';
+  opacity: 0.6;
+}
+
+.about-title {
+  font-family: var(--font-syne);
+  font-weight: 800;
+  font-size: clamp(32px, 3vw, 48px);
+  letter-spacing: -0.02em;
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: var(--space-lg);
+}
+
+.about-title .accent {
+  color: var(--acid);
+  font-style: italic;
+}
+
+.about-text {
+  font-size: 15px;
+  color: var(--dim-light);
+  line-height: 1.8;
+  margin-bottom: var(--space-xl);
+}
+
+.about-features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.about-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.about-feature-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--acid-glow);
+  border: 1px solid rgba(200,255,0,0.25);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.about-feature-icon svg {
+  width: 12px;
+  height: 12px;
+  fill: var(--acid);
+}
+
+.about-feature-text {
+  font-size: 14px;
+  color: var(--dim-light);
+}
+
+.about-terminal {
+  background: var(--ink);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--ink3);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red { background: #ff5f56; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #27c93f; }
+
+.terminal-title {
+  margin-left: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 1px;
+}
+
+.terminal-body {
+  padding: var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.8;
+  min-height: 280px;
+}
+
+.terminal-line {
+  margin-bottom: var(--space-xs);
+}
+
+.terminal-prompt {
+  color: var(--acid);
+  margin-right: var(--space-sm);
+}
+
+.terminal-command {
+  color: var(--white);
+}
+
+.terminal-output {
+  color: var(--dim-light);
+  padding-left: var(--space-lg);
+}
+
+.terminal-output.success {
+  color: var(--acid2);
+}
+
+.terminal-output.error {
+  color: var(--plasma);
+}
+
+.terminal-output.info {
+  color: var(--ice);
+}
+
+/* Log Terminal (Alternative Style) */
+.log-terminal {
+  background: var(--ink);
+  border: 1px solid rgba(200,255,0,0.12);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.log-entry {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+}
+
+.log-time {
+  color: var(--dim);
+  flex-shrink: 0;
+}
+
+.log-tag {
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.log-tag.sys {
+  background: rgba(139,92,246,0.12);
+  color: var(--violet);
+}
+
+.log-tag.sec {
+  background: rgba(200,255,0,0.12);
+  color: var(--acid);
+}
+
+.log-tag.warn {
+  background: rgba(255,184,0,0.12);
+  color: var(--amber);
+}
+
+.log-tag.err {
+  background: rgba(255,45,107,0.12);
+  color: var(--plasma);
+}
+
+.log-text {
+  color: var(--dim-light);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
+  }
+
+  .about-content {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,533 @@
+/* SCS Platform - Premium 3D Cyberpunk Hero */
+
+/* ===== HERO SECTION - SPLIT LAYOUT ===== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px var(--space-xl) var(--space-4xl);
+  overflow: hidden;
+  perspective: 1200px;
+}
+
+.hero-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4xl);
+  max-width: 1400px;
+  width: 100%;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ===== LEFT SIDE - HACKER SCREEN ===== */
+.hero-screen {
+  position: relative;
+  aspect-ratio: 4/3;
+  max-height: 500px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(5,5,8,0.9) 0%, rgba(20,20,30,0.8) 100%);
+  border: 1px solid rgba(200,255,0,0.2);
+  box-shadow: 
+    0 0 60px rgba(200,255,0,0.1),
+    0 20px 60px rgba(0,0,0,0.5),
+    inset 0 0 60px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Glass effect */
+.hero-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.05) 0%,
+    transparent 50%,
+    rgba(200,255,0,0.02) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Screen glow */
+.hero-screen-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(ellipse, rgba(200,255,0,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  animation: screen-glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes screen-glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Terminal window inside screen */
+.hero-screen-terminal {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--dim-light);
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.hero-screen-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(200,255,0,0.1);
+}
+
+.hero-screen-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.hero-screen-dot.red { background: #ff5f56; }
+.hero-screen-dot.yellow { background: #ffbd2e; }
+.hero-screen-dot.green { background: #27ca40; }
+
+.hero-screen-title {
+  margin-left: 8px;
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 1px;
+}
+
+.hero-screen-content {
+  flex: 1;
+  overflow: hidden;
+  line-height: 1.6;
+}
+
+.hero-screen-line {
+  margin-bottom: 4px;
+  opacity: 0;
+  animation: screen-line-fade 0.3s ease forwards;
+}
+
+.hero-screen-line.prompt {
+  color: var(--acid);
+}
+
+.hero-screen-line.success {
+  color: #27ca40;
+}
+
+.hero-screen-line.info {
+  color: var(--ice);
+}
+
+.hero-screen-line.error {
+  color: #ff5f56;
+}
+
+@keyframes screen-line-fade {
+  to { opacity: 1; }
+}
+
+/* Scan line effect */
+.hero-screen-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--acid), transparent);
+  opacity: 0.3;
+  animation: scanline 3s linear infinite;
+  z-index: 3;
+}
+
+@keyframes scanline {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* Corner brackets */
+.hero-screen-corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--acid);
+  opacity: 0.4;
+  z-index: 4;
+}
+
+.hero-screen-corner.tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+.hero-screen-corner.tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+.hero-screen-corner.bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+.hero-screen-corner.br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+/* ===== RIGHT SIDE - TEXT CONTENT ===== */
+.hero-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* Badge */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: rgba(200,255,0,0.05);
+  border: 1px solid rgba(200,255,0,0.15);
+  border-radius: var(--radius-xl);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--acid-dim);
+  margin-bottom: var(--space-2xl);
+}
+
+.hero-badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--acid);
+  border-radius: 50%;
+  animation: pulse-dot 2.5s ease infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200,255,0,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(200,255,0,0); }
+}
+
+/* ===== HERO TITLE - STRUCTURED ===== */
+.hero-title {
+  font-family: var(--font-syne);
+  font-weight: 800;
+  font-size: clamp(48px, 8vw, 90px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--white);
+  margin-bottom: var(--space-xl);
+}
+
+/* "Society of" - thin, elegant */
+.hero-title .hero-label {
+  display: block;
+  font-weight: 400;
+  font-size: 0.38em;
+  letter-spacing: 0.12em;
+  color: var(--dim-medium);
+  margin-bottom: 0.15em;
+  text-transform: uppercase;
+}
+
+/* "Cyber" - SPECIAL ANIMATION - own line */
+.hero-title .accent-wrapper {
+  display: block;
+  position: relative;
+}
+
+/* Glitch effect base for Cyber */
+.hero-title .accent {
+  color: var(--acid);
+  font-weight: 800;
+  font-style: italic;
+  position: relative;
+  display: inline-block;
+  animation: cyber-glow 3s ease-in-out infinite;
+}
+
+/* RGB Split effect using pseudo elements */
+.hero-title .accent::before,
+.hero-title .accent::after {
+  content: 'Cyber';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+}
+
+.hero-title .accent::before {
+  color: #ff0040;
+  animation: rgb-shift-red 2s ease-in-out infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+
+.hero-title .accent::after {
+  color: #00ffff;
+  animation: rgb-shift-blue 2s ease-in-out infinite;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+}
+
+@keyframes cyber-glow {
+  0%, 100% {
+    text-shadow: 0 0 30px rgba(200,255,0,0.3);
+  }
+  50% {
+    text-shadow: 0 0 60px rgba(200,255,0,0.6), 0 0 100px rgba(200,255,0,0.3);
+  }
+}
+
+@keyframes rgb-shift-red {
+  0%, 100% { transform: translate(-2px, 0); }
+  50% { transform: translate(2px, 0); }
+}
+
+@keyframes rgb-shift-blue {
+  0%, 100% { transform: translate(2px, 0); }
+  50% { transform: translate(-2px, 0); }
+}
+
+/* Glitch flicker occasional */
+.hero-title .accent.glitch {
+  animation: cyber-glitch 0.3s ease-in-out;
+}
+
+@keyframes cyber-glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(-3px, -2px); }
+  60% { transform: translate(3px, 2px); }
+  80% { transform: translate(3px, -2px); }
+  100% { transform: translate(0); }
+}
+
+/* Letter stagger animation */
+.hero-title .accent .letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-title .accent.animated .letter {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* "Security" - regular */
+.hero-title .hero-sub {
+  display: block;
+  margin-top: -0.05em;
+  font-weight: 700;
+  color: var(--white);
+}
+
+/* ===== TYPING EFFECT ===== */
+.hero-typing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-xl);
+  min-height: 32px;
+}
+
+.hero-typing-text {
+  font-family: var(--font-mono);
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 600;
+  color: var(--ice);
+  letter-spacing: 0.05em;
+}
+
+.hero-typing-cursor {
+  width: 2px;
+  height: 1.2em;
+  background: var(--acid);
+  animation: cursor-blink 0.8s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Subtitle */
+.hero-subtitle {
+  font-family: var(--font-mono);
+  font-size: clamp(13px, 1.5vw, 16px);
+  font-weight: 300;
+  color: var(--dim-medium);
+  max-width: 480px;
+  margin-bottom: var(--space-2xl);
+  line-height: 1.8;
+}
+
+/* CTA Buttons */
+.hero-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.hero-cta .btn-fill,
+.hero-cta .btn-ghost {
+  padding: 14px 28px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+/* ===== HERO GRID BACKGROUND ===== */
+.hero-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(200,255,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,255,0,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* Gradient orbs */
+.hero-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.12;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-glow-1 {
+  top: -200px;
+  left: -100px;
+  background: var(--violet);
+}
+
+.hero-glow-2 {
+  bottom: -200px;
+  right: -100px;
+  background: var(--acid);
+}
+
+.hero-glow-3 {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 150px;
+  background: var(--acid);
+  filter: blur(60px);
+  opacity: 0.06;
+}
+
+/* ===== SCROLL INDICATOR ===== */
+.hero-scroll {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--dim);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: scroll-fade 2s ease-in-out infinite;
+}
+
+.hero-scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--acid), transparent);
+  animation: scroll-line 1.5s ease-in-out infinite;
+}
+
+@keyframes scroll-fade {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes scroll-line {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  51% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .hero-wrapper {
+    grid-template-columns: 1fr;
+    gap: var(--space-3xl);
+    text-align: center;
+  }
+
+  .hero-screen {
+    max-width: 500px;
+    margin: 0 auto;
+    order: 2;
+  }
+
+  .hero-content {
+    order: 1;
+  }
+
+  .hero-subtitle {
+    margin: 0 auto var(--space-2xl);
+  }
+
+  .hero-cta {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 120px var(--space-lg) var(--space-3xl);
+  }
+
+  .hero-screen {
+    aspect-ratio: 16/10;
+  }
+
+  .hero-screen-terminal {
+    font-size: 9px;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .hero-cta .btn-fill,
+  .hero-cta .btn-ghost {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-scroll {
+    display: none;
+  }
+}

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team — SCS Platform</title>
+  <meta name="description" content="Meet the elite team of security researchers at Society of Cyber Security.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/reset.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/team.css">
+  <link rel="stylesheet" href="assets/css/hero.css">
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div id="c-dot"></div>
+  <div id="c-ring"></div>
+
+  <!-- THREE.JS CANVAS -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><span>S</span></div>
+      <span>SCS</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="team.html" class="nav-link active">Team</a>
+      <a href="projects.html" class="nav-link">Projects</a>
+      <a href="events.html" class="nav-link">Events</a>
+      <a href="resources.html" class="nav-link">Resources</a>
+      <a href="terminal.html" class="nav-link">Terminal</a>
+      <a href="join.html" class="nav-link">Join</a>
+    </div>
+    <div class="nav-hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <main>
+    <!-- TEAM SECTION -->
+    <section class="team section">
+      <div class="container">
+        <div class="section-header sr">
+          <span class="section-label">Our Team</span>
+          <h2 class="section-title">Elite <span class="accent">Researchers</span></h2>
+          <span class="section-count">6 members</span>
+        </div>
+        
+        <div class="team-grid">
+          <!-- Team Member 1 -->
+          <div class="team-card sr d1" style="--accent-color: #c8ff00;">
+            <div class="team-card-header">
+              <div class="team-avatar">AX</div>
+              <div class="team-rank">
+                <div class="team-rank-label">CTF Rank</div>
+                <div class="team-rank-value">#3</div>
+              </div>
+            </div>
+            <h3 class="team-alias">AXIOM_0</h3>
+            <p class="team-role">Lead Security Researcher</p>
+            <div class="team-tags">
+              <span class="m-tag mt-a">Web Sec</span>
+              <span class="m-tag mt-b">OSINT</span>
+              <span class="m-tag mt-c">RE</span>
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="team-stat-value">12</div>
+                <div class="team-stat-label">CVEs</div>
+              </div>
+              <div class="team-stat">
+                <div class="team-stat-value">#3</div>
+                <div class="team-stat-label">CTF Rank</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Team Member 2 -->
+          <div class="team-card sr d2" style="--accent-color: #00f5ff;">
+            <div class="team-card-header">
+              <div class="team-avatar">PH</div>
+              <div class="team-rank">
+                <div class="team-rank-label">CTF Rank</div>
+                <div class="team-rank-value">#7</div>
+              </div>
+            </div>
+            <h3 class="team-alias">PHANTOM_7</h3>
+            <p class="team-role">Malware Analyst</p>
+            <div class="team-tags">
+              <span class="m-tag mt-d">Malware</span>
+              <span class="m-tag mt-c">RE</span>
+              <span class="m-tag mt-e">Forensics</span>
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="team-stat-value">8</div>
+                <div class="team-stat-label">CVEs</div>
+              </div>
+              <div class="team-stat">
+                <div class="team-stat-value">#7</div>
+                <div class="team-stat-label">CTF Rank</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Team Member 3 -->
+          <div class="team-card sr d3" style="--accent-color: #8b5cf6;">
+            <div class="team-card-header">
+              <div class="team-avatar">NG</div>
+              <div class="team-rank">
+                <div class="team-rank-label">CTF Rank</div>
+                <div class="team-rank-value">#1</div>
+              </div>
+            </div>
+            <h3 class="team-alias">NOCTURN_G</h3>
+            <p class="team-role">Exploit Developer</p>
+            <div class="team-tags">
+              <span class="m-tag mt-d">Exploit Dev</span>
+              <span class="m-tag mt-a">Pwn</span>
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="team-stat-value">21</div>
+                <div class="team-stat-label">CVEs</div>
+              </div>
+              <div class="team-stat">
+                <div class="team-stat-value">#1</div>
+                <div class="team-stat-label">CTF Rank</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Team Member 4 -->
+          <div class="team-card sr d4" style="--accent-color: #ffb800;">
+            <div class="team-card-header">
+              <div class="team-avatar">Z3</div>
+              <div class="team-rank">
+                <div class="team-rank-label">CTF Rank</div>
+                <div class="team-rank-value">#11</div>
+              </div>
+            </div>
+            <h3 class="team-alias">ZEROW3</h3>
+            <p class="team-role">AI Security Specialist</p>
+            <div class="team-tags">
+              <span class="m-tag mt-b">AI/ML</span>
+              <span class="m-tag mt-a">Web Sec</span>
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="team-stat-value">5</div>
+                <div class="team-stat-label">CVEs</div>
+              </div>
+              <div class="team-stat">
+                <div class="team-stat-value">#11</div>
+                <div class="team-stat-label">CTF Rank</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Team Member 5 -->
+          <div class="team-card sr d5" style="--accent-color: #ff2d6b;">
+            <div class="team-card-header">
+              <div class="team-avatar">CR</div>
+              <div class="team-rank">
+                <div class="team-rank-label">CTF Rank</div>
+                <div class="team-rank-value">#5</div>
+              </div>
+            </div>
+            <h3 class="team-alias">CR4WL3R</h3>
+            <p class="team-role">Network Pentester</p>
+            <div class="team-tags">
+              <span class="m-tag mt-b">Network</span>
+              <span class="m-tag mt-e">OSINT</span>
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="team-stat-value">9</div>
+                <div class="team-stat-label">CVEs</div>
+              </div>
+              <div class="team-stat">
+                <div class="team-stat-value">#5</div>
+                <div class="team-stat-label">CTF Rank</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Team Member 6 -->
+          <div class="team-card sr d5" style="--accent-color: #7dff6b;">
+            <div class="team-card-header">
+              <div class="team-avatar">SH</div>
+              <div class="team-rank">
+                <div class="team-rank-label">CTF Rank</div>
+                <div class="team-rank-value">#2</div>
+              </div>
+            </div>
+            <h3 class="team-alias">SH4D0WFOX</h3>
+            <p class="team-role">Red Team Operator</p>
+            <div class="team-tags">
+              <span class="m-tag mt-d">Red Team</span>
+              <span class="m-tag mt-c">RE</span>
+              <span class="m-tag mt-b">OSINT</span>
+            </div>
+            <div class="team-stats">
+              <div class="team-stat">
+                <div class="team-stat-value">17</div>
+                <div class="team-stat-label">CVEs</div>
+              </div>
+              <div class="team-stat">
+                <div class="team-stat-value">#2</div>
+                <div class="team-stat-label">CTF Rank</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="assets/js/particles.js"></script>
+  <script src="assets/js/cursor.js"></script>
+  <script src="assets/js/nav.js"></script>
+  <script src="assets/js/animations.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+/* SCS Platform - Heatmap Section - REFINED */
+
+/* ===== HEATMAP SECTION ===== */
+.heatmap {
+  position: relative;
+  background: var(--ink2);
+}
+
+.heatmap-container {
+  background: var(--ink3);
+  border: 1px solid rgba(255,255,255,0.03);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+}
+
+.heatmap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+}
+
+.heatmap-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--dim);
+}
+
+.heatmap-legend-scale {
+  display: flex;
+  gap: 2px;
+}
+
+.heatmap-legend-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(52, 1fr);
+  gap: 3px;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--ink2);
+  transition: all 0.25s var(--ease-expo);
+  cursor: pointer;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.8);
+  z-index: 10;
+}
+
+/* Heatmap Levels */
+.hm-0 {
+  background: var(--ink2);
+}
+
+.hm-1 {
+  background: rgba(200,255,0,0.1);
+}
+
+.hm-2 {
+  background: rgba(200,255,0,0.2);
+}
+
+.hm-3 {
+  background: rgba(200,255,0,0.35);
+}
+
+.hm-4 {
+  background: var(--acid);
+  box-shadow: 0 0 6px rgba(200,255,0,0.4);
+}
+
+/* Heatmap Stats */
+.heatmap-stats {
+  display: flex;
+  gap: var(--space-2xl);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid rgba(255,255,255,0.03);
+}
+
+.heatmap-stat {
+  text-align: center;
+}
+
+.heatmap-stat-value {
+  font-family: var(--font-syne);
+  font-weight: 800;
+  font-size: 32px;
+  color: var(--white);
+}
+
+.heatmap-stat-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .heatmap-grid {
+    grid-template-columns: repeat(26, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .heatmap-grid {
+    grid-template-columns: repeat(13, 1fr);
+  }
+
+  .heatmap-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .heatmap-stats {
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+  }
+
+  .heatmap-stat {
+    flex: 1;
+    min-width: 80px;
+  }
+}

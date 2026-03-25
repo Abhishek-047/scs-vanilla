@@ -1,0 +1,368 @@
+/* SCS Platform - Shared Components - REFINED */
+
+/* ===== BUTTONS ===== */
+
+/* Primary Fill Button - JOIN SCS */
+.btn-fill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: var(--acid);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: all 0.35s var(--ease-expo);
+}
+
+.btn-fill:hover {
+  background: var(--acid);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(200,255,0,0.25);
+}
+
+/* Ghost Button - ACCESS TERMINAL */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: transparent;
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.15);
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: all 0.35s var(--ease-expo);
+}
+
+.btn-ghost:hover {
+  border-color: var(--acid);
+  color: var(--acid);
+  background: var(--acid-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(200,255,0,0.1);
+}
+
+/* TX Button (Form Submit) */
+.btn-tx {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--acid);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: all 0.35s var(--ease-expo);
+}
+
+.btn-tx:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(200,255,0,0.25);
+}
+
+.btn-tx:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===== TAGS ===== */
+.m-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+  transition: all 0.25s var(--ease-expo);
+}
+
+.m-tag:hover {
+  transform: translateY(-1px);
+}
+
+.mt-a {
+  border-color: var(--acid);
+  color: var(--acid);
+  background: rgba(200,255,0,0.05);
+}
+
+.mt-b {
+  border-color: var(--ice);
+  color: var(--ice);
+  background: rgba(0,245,255,0.05);
+}
+
+.mt-c {
+  border-color: var(--violet);
+  color: var(--violet);
+  background: rgba(139,92,246,0.05);
+}
+
+.mt-d {
+  border-color: var(--plasma);
+  color: var(--plasma);
+  background: rgba(255,45,107,0.05);
+}
+
+.mt-e {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgba(255,184,0,0.05);
+}
+
+/* ===== SECTION HEADERS ===== */
+.section-header {
+  margin-bottom: var(--space-3xl);
+}
+
+.section-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--acid);
+  margin-bottom: var(--space-sm);
+}
+
+.section-label::before {
+  content: '// ';
+  opacity: 0.6;
+}
+
+.section-title {
+  font-family: var(--font-syne);
+  font-weight: 800;
+  font-size: clamp(32px, 3vw, 48px);
+  letter-spacing: -0.02em;
+  color: var(--white);
+  line-height: 1.15;
+}
+
+.section-title .accent {
+  color: var(--acid);
+  font-style: italic;
+}
+
+.section-count {
+  float: right;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 1px;
+}
+
+/* ===== STATUS DOT ===== */
+.p-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: var(--space-xs);
+}
+
+.p-dot-active {
+  background: var(--acid2);
+  box-shadow: 0 0 8px var(--acid2);
+  animation: pulse-dot 2s ease infinite;
+}
+
+.p-dot-beta {
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
+}
+
+.p-dot-archived {
+  background: rgba(255,255,255,0.3);
+  box-shadow: none;
+}
+
+/* ===== CARD BASE ===== */
+.card {
+  background: var(--ink3);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: all 0.35s var(--ease-expo);
+}
+
+.card:hover {
+  border-color: rgba(200,255,0,0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px 80px rgba(0,0,0,0.5);
+}
+
+/* ===== BADGES ===== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+}
+
+.badge-acid {
+  background: rgba(200,255,0,0.1);
+  color: var(--acid);
+  border: 1px solid rgba(200,255,0,0.3);
+}
+
+.badge-ice {
+  background: rgba(0,245,255,0.1);
+  color: var(--ice);
+  border: 1px solid rgba(0,245,255,0.3);
+}
+
+.badge-violet {
+  background: rgba(139,92,246,0.1);
+  color: var(--violet);
+  border: 1px solid rgba(139,92,246,0.3);
+}
+
+.badge-plasma {
+  background: rgba(255,45,107,0.1);
+  color: var(--plasma);
+  border: 1px solid rgba(255,45,107,0.3);
+}
+
+.badge-grey {
+  background: rgba(255,255,255,0.03);
+  color: var(--dim);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ===== INPUTS ===== */
+.input-field {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--ink2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  transition: all 0.3s var(--ease-expo);
+}
+
+.input-field:focus {
+  border-color: var(--acid);
+  box-shadow: 0 0 0 3px rgba(200,255,0,0.08);
+  outline: none;
+}
+
+.input-field::placeholder {
+  color: var(--dim);
+}
+
+.textarea-field {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--ink2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  min-height: 120px;
+  resize: vertical;
+  transition: all 0.3s var(--ease-expo);
+}
+
+.textarea-field:focus {
+  border-color: var(--acid);
+  box-shadow: 0 0 0 3px rgba(200,255,0,0.08);
+  outline: none;
+}
+
+.select-field {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--ink2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c8ff00' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  transition: all 0.3s var(--ease-expo);
+}
+
+.select-field:focus {
+  border-color: var(--acid);
+  box-shadow: 0 0 0 3px rgba(200,255,0,0.08);
+  outline: none;
+}
+
+/* ===== SOCIAL LINKS ===== */
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  color: var(--dim-medium);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s var(--ease-expo);
+}
+
+.social-link:hover {
+  border-color: var(--acid);
+  color: var(--acid);
+  transform: translateY(-2px);
+  background: var(--acid-glow);
+}
+
+/* ===== STACK PILLS ===== */
+.stack-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--dim-light);
+  transition: all 0.25s var(--ease-expo);
+}
+
+.stack-pill:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+  background: var(--ice-glow);
+}

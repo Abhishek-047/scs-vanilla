@@ -1,0 +1,218 @@
+/* SCS Platform - Projects Section - REFINED */
+
+/* ===== PROJECTS SECTION ===== */
+.projects {
+  position: relative;
+  background: var(--ink);
+}
+
+.projects-grid {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+/* Featured Project (Bento Style) */
+.project-featured {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--space-xl);
+  background: var(--ink3);
+  border: 1px solid rgba(255,255,255,0.03);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s var(--ease-expo);
+}
+
+.project-featured::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.03),
+    transparent
+  );
+  transition: left 0.6s var(--ease-expo);
+}
+
+.project-featured:hover::after {
+  left: 200%;
+}
+
+.project-featured:hover {
+  border-color: rgba(200,255,0,0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px 100px rgba(0,0,0,0.5);
+}
+
+.project-featured-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.project-id {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 2px;
+}
+
+.project-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.project-title {
+  font-family: var(--font-syne);
+  font-weight: 800;
+  font-size: clamp(24px, 3vw, 32px);
+  color: var(--white);
+  margin-bottom: var(--space-md);
+}
+
+.project-desc {
+  font-size: 15px;
+  color: var(--dim-light);
+  line-height: 1.7;
+  margin-bottom: var(--space-lg);
+  flex: 1;
+}
+
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--ice);
+  margin-top: var(--space-lg);
+  transition: color 0.25s var(--ease-expo);
+}
+
+.project-link:hover {
+  color: var(--acid);
+}
+
+.project-link svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+/* Regular Project Card */
+.project-card {
+  background: var(--ink3);
+  border: 1px solid rgba(255,255,255,0.03);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s var(--ease-expo);
+}
+
+.project-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.03),
+    transparent
+  );
+  transition: left 0.6s var(--ease-expo);
+}
+
+.project-card:hover::after {
+  left: 200%;
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(200,255,0,0.1);
+  box-shadow: 0 20px 40px 60px rgba(0,0,0,0.4);
+}
+
+.project-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.project-card-title {
+  font-family: var(--font-syne);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--white);
+}
+
+.project-card-desc {
+  font-size: 13px;
+  color: var(--dim-light);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+}
+
+/* Projects Grid (3 columns for index, 2 for full page) */
+.projects-grid-full {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .project-featured {
+    grid-template-columns: 1fr;
+  }
+
+  .projects-grid-full {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .project-header {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+}

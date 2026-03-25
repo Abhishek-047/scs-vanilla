@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal — SCS Platform</title>
+  <meta name="description" content="Access the SCS Terminal - An interactive hacker console.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/reset.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/terminal.css">
+  <link rel="stylesheet" href="assets/css/terminal-page.css">
+</head>
+<body class="terminal-page">
+
+  <!-- CURSOR -->
+  <div id="c-dot"></div>
+  <div id="c-ring"></div>
+
+  <!-- MATRIX RAIN CANVAS -->
+  <canvas id="matrix-canvas" class="matrix-canvas"></canvas>
+
+  <!-- FULLSCREEN TERMINAL -->
+  <div class="terminal-fullscreen">
+    <div class="terminal-header-bar">
+      <div class="terminal-dots">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+      </div>
+      <div class="terminal-title-bar">
+        <span class="terminal-icon">⬢</span>
+        <span>guest@scs-terminal — bash</span>
+      </div>
+      <div class="terminal-controls">
+        <button class="terminal-btn" id="terminal-fullscreen-btn" title="Toggle Fullscreen">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+      </div>
+    </div>
+    
+    <div class="terminal-content" id="terminal-content">
+      <div class="terminal-welcome" id="terminal-welcome">
+        <div class="terminal-ascii">
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║     █████╗  ██████╗████████╗███████╗██████╗ ████████╗███████╗██╗  ██╗      ║
+║    ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝╚██╗██╔╝      ║
+║    ███████║██║        ██║   █████╗  ██████╔╝   ██║   █████╗   ╚███╔╝       ║
+║    ██╔══██║██║        ██║   ██╔══╝  ██╔══██╗   ██║   ██╔══╝   ██╔██╗       ║
+║    ██║  ██║╚██████╗   ██║   ███████╗██║  ██║   ██║   ███████╗██╔╝ ██╗      ║
+║    ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝      ║
+║                      ███████╗ ██████╗ ██████╗  █████╗ ██████╗                ║
+║                      ██╔════╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗               ║
+║                      ███████╗██║   ██║██████╔╝███████║██████╔╝               ║
+║                      ╚════██║██║   ██║██╔══██╗██╔══██║██╔══██╗               ║
+║                      ███████║╚██████╔╝██║  ██║██║  ██║██║  ██║               ║
+║                      ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝               ║
+║                                                                              ║
+║                   ██████╗ ███████╗ █████╗ ██████╗                       ║
+║                   ██╔══██╗██╔════╝██╔══██╗██╔══██╗                      ║
+║                   ██████╔╝█████╗  ███████║██████╔╝                      ║
+║                   ██╔══██╗██╔══╝  ██╔══██║██╔══██╗                      ║
+║                   ██║  ██║███████╗██║  ██║██║  ██║                      ║
+║                   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝                      ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+        </div>
+        <div class="terminal-version">SCS Terminal v2.4.0 [Secure Build]</div>
+        <div class="terminal-copyright">© 2024 Society of Cyber Security. All rights reserved.</div>
+        <div class="terminal-typewriter" id="typewriter-intro"></div>
+      </div>
+      
+      <div class="terminal-output" id="term-output">
+        <!-- Commands will be added here -->
+      </div>
+    </div>
+    
+    <div class="terminal-input-line">
+      <span class="terminal-prompt">guest@scs:~$</span>
+      <input type="text" id="term-input" class="terminal-input" placeholder="Type a command..." autocomplete="off" spellcheck="false">
+    </div>
+    
+    <div class="terminal-quick-commands">
+      <button class="quick-cmd" data-cmd="help">help</button>
+      <button class="quick-cmd" data-cmd="ls">ls</button>
+      <button class="quick-cmd" data-cmd="whoami">whoami</button>
+      <button class="quick-cmd" data-cmd="status">status</button>
+      <button class="quick-cmd" data-cmd="nmap">nmap</button>
+      <button class="quick-cmd" data-cmd="hack">hack</button>
+      <button class="quick-cmd" data-cmd="clear">clear</button>
+    </div>
+  </div>
+
+  <!-- TERMINAL STATUS BAR -->
+  <div class="terminal-status-bar">
+    <div class="terminal-status-left">
+      <span class="status-connection">
+        <span class="status-dot online"></span>
+        Connected
+      </span>
+      <span class="status-sep">|</span>
+      <span class="status-time" id="terminal-time">--:--:--</span>
+    </div>
+    <div class="terminal-status-right">
+      <span class="status-user">guest</span>
+      <span class="status-sep">|</span>
+      <span class="status-session">Session: <span id="session-id">------</span></span>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="assets/js/cursor.js"></script>
+  <script src="assets/js/animations.js"></script>
+  <script src="assets/js/terminal.js"></script>
+  <script src="assets/js/matrix.js"></script>
+</body>
+</html>

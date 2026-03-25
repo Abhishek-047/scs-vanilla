@@ -1,0 +1,99 @@
+/* SCS Platform - CSS Custom Properties - REFINED */
+
+:root {
+  /* Base Colors (Dark Theme) */
+  --ink:    #050508;
+  --ink2:   #0b0b12;
+  --ink3:   #12121e;
+  
+  /* Primary Accent - Neon Green (Hacker Identity) - Softer */
+  --acid:   #c8ff00;
+  --acid-dim: rgba(200,255,0,0.6);
+  --acid-glow: rgba(200,255,0,0.15);
+  --acid2:  #7dff6b;
+  
+  /* Enhanced Cyberpunk Palette - More Subtle */
+  --plasma: #ff2d6b;
+  --plasma-dim: rgba(255,45,107,0.6);
+  --plasma-glow: rgba(255,45,107,0.12);
+  
+  --ice:    #00f5ff;
+  --ice-dim: rgba(0,245,255,0.6);
+  --ice-glow: rgba(0,245,255,0.08);
+  
+  --violet: #8b5cf6;
+  --violet-dim: rgba(139,92,246,0.6);
+  --violet-glow: rgba(139,92,246,0.15);
+  
+  --amber:  #ffb800;
+  --amber-dim: rgba(255,184,0,0.6);
+  --amber-glow: rgba(255,184,0,0.12);
+  
+  /* Premium Gradient Overlays */
+  --gradient-purple-soft: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, transparent 60%);
+  --gradient-blue-soft: linear-gradient(135deg, rgba(0,245,255,0.06) 0%, transparent 60%);
+  --gradient-red-soft: linear-gradient(135deg, rgba(255,45,107,0.06) 0%, transparent 60%);
+  --gradient-acid-soft: linear-gradient(135deg, rgba(200,255,0,0.04) 0%, transparent 50%);
+  
+  /* Radial Glows */
+  --radial-purple: radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139,92,246,0.12) 0%, transparent 70%);
+  --radial-blue: radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,245,255,0.06) 0%, transparent 60%);
+  --radial-pink: radial-gradient(ellipse 70% 50% at 85% 75%, rgba(255,45,107,0.08) 0%, transparent 60%);
+  --radial-acid: radial-gradient(ellipse 50% 30% at 50% 80%, rgba(200,255,0,0.06) 0%, transparent 50%);
+  
+  /* Text Colors - Refined */
+  --white: #f0f0f6;
+  --white-dim: rgba(240,240,246,0.85);
+  --dim:   rgba(240,240,246,0.35);
+  --dim-medium: rgba(240,240,246,0.55);
+  --dim-light: rgba(240,240,246,0.75);
+  
+  /* Glow Effects - Softer for Premium Feel */
+  --glow-purple:   rgba(139,92,246,0.2);
+  --glow-magenta:  rgba(255,45,107,0.2);
+  --glow-cyan:     rgba(0,245,255,0.2);
+  --glow-acid:     rgba(200,255,0,0.25);
+  --glow-pink:     rgba(255,77,240,0.2);
+  
+  /* Typography */
+  --font-syne: 'Syne', sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'JetBrains Mono', monospace;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  /* Transitions */
+  --ease-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-back:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-glow:  cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth: 0.4s var(--ease-expo);
+  
+  /* Spacing */
+  --space-xs:  0.25rem;
+  --space-sm:  0.5rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+  --space-5xl: 8rem;
+  
+  /* Border Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  
+  /* Shadows - Softer for Premium Feel */
+  --shadow-glow-purple:  0 0 25px rgba(139,92,246,0.2);
+  --shadow-glow-magenta: 0 0 25px rgba(255,45,107,0.2);
+  --shadow-glow-cyan:    0 0 25px rgba(0,245,255,0.2);
+  --shadow-glow-acid:    0 0 25px rgba(200,255,0,0.2);
+  --shadow-glow-pink:    0 0 25px rgba(255,77,240,0.2);
+  --shadow-inner-glow:   inset 0 0 20px rgba(139,92,246,0.08);
+  
+  /* Glass Effect */
+  --glass-bg: rgba(5,5,8,0.75);
+  --glass-border: rgba(255,255,255,0.06);
+  --glass-blur: blur(12px);
+}
