@@ -3,7 +3,7 @@
  * Advanced Scroll-Based Cinematic Experience
  */
 
-(function() {
+(function () {
   'use strict';
 
   // Constants & LERP
@@ -52,7 +52,9 @@
     initEasterEggs();
     initMagneticButtons();
     initScrollReveals();
+    initHeroMicroAnimations();
   }
+
 
   // ===== 1. TRACKERS =====
   function initScrollAndMouseTracker() {
@@ -66,7 +68,7 @@
     window.addEventListener('scroll', () => {
       state.targetScroll = window.scrollY;
     }, { passive: true });
-    
+
     // Set initial scroll
     state.scroll = window.scrollY;
     state.targetScroll = window.scrollY;
@@ -103,37 +105,37 @@
 
   function applyScrollStory() {
     if (!els.storyContainer) return;
-    
+
     const windowHeight = window.innerHeight;
-    const scrollMax = windowHeight * 3; 
-    
+    const scrollMax = windowHeight * 3;
+
     let rawProgress = state.scroll / scrollMax;
     let progress = Math.max(0, Math.min(1, rawProgress));
 
     // Phase 1 (0.0 to 0.33): Normal
     // Phase 2 (0.33 to 0.66): Slight zoom
     // Phase 3 (0.66 to 1.0): Strong zoom, fade bg, transition section
-    
+
     let p1 = Math.min(progress / 0.33, 1);
     let p2 = Math.max(0, Math.min((progress - 0.33) / 0.33, 1));
     let p3 = Math.max(0, Math.min((progress - 0.66) / 0.34, 1));
-    
+
     // Zoom logic
     let currentZoom = 1;
     if (p2 > 0) currentZoom = 1 + p2 * 1.5; // Slight zoom up to 2.5x
     if (p3 > 0) currentZoom = 2.5 + p3 * 15; // Strong zoom into the network
-    
+
     if (window.GlobeSim) {
-       window.GlobeSim.setZoom(currentZoom);
+      window.GlobeSim.setZoom(currentZoom);
     }
-    
+
     // Fade out text/left columns
-    let fadeOut = Math.max(0, p2); 
+    let fadeOut = Math.max(0, p2);
     if (els.heroText) {
       els.heroText.style.opacity = 1 - fadeOut * 2;
       els.heroText.style.transform = `translateX(${-fadeOut * 100}px)`;
     }
-    
+
     if (els.scrollIndicator) {
       els.scrollIndicator.style.opacity = 1 - p1;
     }
@@ -141,32 +143,32 @@
     // Globe moves to center slightly
     if (els.globeContainer) {
       let shiftValue = window.innerWidth < 768 ? 0 : (window.innerWidth * 0.15);
-      let moveLeft = p1 * shiftValue; 
+      let moveLeft = p1 * shiftValue;
       els.globeContainer.style.transform = `translateX(${-moveLeft}px)`;
       els.globeContainer.style.opacity = 1 - p3;
     }
-    
+
     let bgFadeOut = Math.max(0, p3);
     if (els.hackerVideo) els.hackerVideo.style.opacity = 1 - bgFadeOut;
     if (els.hackerOverlay) els.hackerOverlay.style.opacity = 1 - bgFadeOut;
-    
+
     // Transition Section (text "> entering secure system...")
     const transitionSection = document.getElementById('transition-section');
     if (transitionSection) {
-       // Fade in during first half of Phase 3, fade out at end of Phase 3
-       let tOp = Math.max(0, Math.min((p3 - 0.2) / 0.3, 1)); 
-       let tOut = Math.max(0, Math.min((p3 - 0.8) / 0.2, 1));
-       transitionSection.style.opacity = tOp * (1 - tOut);
+      // Fade in during first half of Phase 3, fade out at end of Phase 3
+      let tOp = Math.max(0, Math.min((p3 - 0.2) / 0.3, 1));
+      let tOut = Math.max(0, Math.min((p3 - 0.8) / 0.2, 1));
+      transitionSection.style.opacity = tOp * (1 - tOut);
     }
 
     if (els.terminalSection) {
       let termOp = Math.max(0, Math.min((p3 - 0.9) / 0.1, 1));
       els.terminalSection.style.opacity = termOp;
-      
+
       if (termOp > 0.9) {
         els.terminalSection.style.pointerEvents = 'auto';
         if (els.matrixCanvas) els.matrixCanvas.classList.add('active');
-        
+
         if (!state.terminalTriggered) {
           state.terminalTriggered = true;
           const termInput = document.getElementById('term-input');
@@ -191,7 +193,7 @@
 
     function typeLoop() {
       els.typingText.textContent = fullText.substring(0, charIndex);
-      
+
       if (charIndex < fullText.length) {
         charIndex++;
         // Slight randomness in typing speed
@@ -201,7 +203,7 @@
         // Done typing, maybe blink cursor indefinitely
       }
     }
-    
+
     // Start after a short delay
     setTimeout(typeLoop, 800);
   }
@@ -215,7 +217,7 @@
       setTimeout(() => {
         els.cyberText.classList.add('glitch-active');
         setTimeout(() => {
-          if(Math.random() > 0.5) els.cyberText.classList.remove('glitch-active');
+          if (Math.random() > 0.5) els.cyberText.classList.remove('glitch-active');
           setTimeout(() => {
             els.cyberText.classList.remove('glitch-active');
           }, 100);
@@ -273,7 +275,68 @@
     document.head.appendChild(style);
   }
 
+  // ===== HERO MICRO ANIMATIONS =====
+  function initHeroMicroAnimations() {
+    // 1. Threat bar fill animation
+    const bar = document.getElementById('h-threat-bar');
+    if (bar) {
+      setTimeout(() => { bar.style.width = '78%'; }, 900);
+    }
+
+    // 2. Threat counter tick-up
+    const valEl = document.getElementById('h-threat-val');
+    if (valEl) {
+      let count = 0;
+      const target = 2847;
+      const step = Math.ceil(target / 60);
+      const ticker = setInterval(() => {
+        count = Math.min(count + step, target);
+        valEl.textContent = count.toLocaleString();
+        if (count >= target) clearInterval(ticker);
+      }, 20);
+    }
+
+    // 3. Live log cycling
+    const logContainer = document.getElementById('h-log-lines');
+    const logPool = [
+      { cls: 'h-log-ok', text: '[OK] auth.scs \u2014 verified' },
+      { cls: 'h-log-warn', text: '[!]\u00a0 scan.int \u2014 running' },
+      { cls: 'h-log-ok', text: '[OK] firewall \u2014 active' },
+      { cls: 'h-log-ok', text: '[OK] vpn.tun0 \u2014 encrypted' },
+      { cls: 'h-log-warn', text: '[!]\u00a0 probe.ext \u2014 detected' },
+      { cls: 'h-log-ok', text: '[OK] node.sync \u2014 complete' },
+      { cls: 'h-log-warn', text: '[!]\u00a0 geo.block \u2014 triggered' },
+      { cls: 'h-log-ok', text: '[OK] ssl.cert \u2014 valid' },
+    ];
+    let logIdx = 3;
+    if (logContainer) {
+      setInterval(() => {
+        const entry = logPool[logIdx % logPool.length];
+        logIdx++;
+        const lines = logContainer.querySelectorAll('.h-log-line');
+        // Shift: remove first, add new at end
+        if (lines.length >= 3) lines[0].remove();
+        const div = document.createElement('div');
+        div.className = 'h-log-line';
+        div.style.cssText = 'opacity:0;transition:opacity 0.4s ease;';
+        div.innerHTML = `<span class="${entry.cls}">${entry.text.split('\u2014')[0].trim()}</span> \u2014 ${entry.text.split('\u2014')[1].trim()}`;
+        logContainer.appendChild(div);
+        requestAnimationFrame(() => requestAnimationFrame(() => { div.style.opacity = '1'; }));
+      }, 2800);
+    }
+
+    // 4. Node ID hex ticker
+    const nodeEl = document.getElementById('h-node-id');
+    if (nodeEl) {
+      setInterval(() => {
+        const hex = Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+        nodeEl.textContent = `NODE_0x${hex}`;
+      }, 4000);
+    }
+  }
+
   function initEasterEggs() {
+
     const navLogo = document.getElementById('nav-logo');
     if (navLogo) {
       navLogo.addEventListener('dblclick', () => {

@@ -1,5 +1,5 @@
 // globe.js
-window.GlobeSim = (function() {
+window.GlobeSim = (function () {
   let scene, camera, renderer;
   let globeGroup, outerStreamsGroup;
   let points, lines;
@@ -9,10 +9,10 @@ window.GlobeSim = (function() {
   const PARTICLE_COUNT = 3000;
   const RADIUS = 5;
   let positions;
-  
+
   let time = 0;
   let glassPanel;
-  
+
   function init() {
     const container = document.getElementById('globe-container');
     if (!container || typeof THREE === 'undefined') return;
@@ -35,28 +35,28 @@ window.GlobeSim = (function() {
     positions = new Float32Array(PARTICLE_COUNT * 3);
     const opacities = new Float32Array(PARTICLE_COUNT);
     const pointSizes = new Float32Array(PARTICLE_COUNT);
-    
+
     // Distribute particles across a sphere
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-        const phi = Math.acos(-1 + (2 * Math.random()));
-        const theta = Math.random() * Math.PI * 2;
-        
-        // Slight depth variation for organic feel
-        const r = RADIUS + (Math.random() - 0.5) * 0.15; 
-        
-        positions[i*3] = r * Math.cos(theta) * Math.sin(phi);
-        positions[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
-        positions[i*3+2] = r * Math.cos(phi);
-        
-        opacities[i] = Math.random() * 0.8 + 0.2; // Base glow intensity
-        pointSizes[i] = Math.random() * 2 + 1;    // Variable node sizes
+      const phi = Math.acos(-1 + (2 * Math.random()));
+      const theta = Math.random() * Math.PI * 2;
+
+      // Slight depth variation for organic feel
+      const r = RADIUS + (Math.random() - 0.5) * 0.15;
+
+      positions[i * 3] = r * Math.cos(theta) * Math.sin(phi);
+      positions[i * 3 + 1] = r * Math.sin(theta) * Math.sin(phi);
+      positions[i * 3 + 2] = r * Math.cos(phi);
+
+      opacities[i] = Math.random() * 0.8 + 0.2; // Base glow intensity
+      pointSizes[i] = Math.random() * 2 + 1;    // Variable node sizes
     }
-    
+
     const pGeometry = new THREE.BufferGeometry();
     pGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     pGeometry.setAttribute('aOpacity', new THREE.BufferAttribute(opacities, 1));
     pGeometry.setAttribute('aSize', new THREE.BufferAttribute(pointSizes, 1));
-    
+
     const pMaterial = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
@@ -97,44 +97,44 @@ window.GlobeSim = (function() {
       blending: THREE.AdditiveBlending,
       depthWrite: false
     });
-    
+
     points = new THREE.Points(pGeometry, pMaterial);
     globeGroup.add(points);
-    
+
     // ==========================================
     // 2. NETWORK CONNECTIONS (LINES)
     // ==========================================
     const linePositions = [];
     const lineOpacitiesArray = [];
     const MAX_DISTANCE = 0.8;
-    
+
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-        // Connect a scattered subset
-        if (Math.random() > 0.35) continue;
-        
-        const p1 = new THREE.Vector3(positions[i*3], positions[i*3+1], positions[i*3+2]);
-        
-        let connections = 0;
-        for (let j = i + 1; j < PARTICLE_COUNT; j++) {
-            if (connections > 3) break; // Limit branches per node
-            
-            const p2 = new THREE.Vector3(positions[j*3], positions[j*3+1], positions[j*3+2]);
-            const dist = p1.distanceTo(p2);
-            
-            if (dist < MAX_DISTANCE) {
-                linePositions.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
-                // Assign identical random phase anchor to both vertices of the line segment
-                const rnd = Math.random();
-                lineOpacitiesArray.push(rnd, rnd);
-                connections++;
-            }
+      // Connect a scattered subset
+      if (Math.random() > 0.35) continue;
+
+      const p1 = new THREE.Vector3(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
+
+      let connections = 0;
+      for (let j = i + 1; j < PARTICLE_COUNT; j++) {
+        if (connections > 3) break; // Limit branches per node
+
+        const p2 = new THREE.Vector3(positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2]);
+        const dist = p1.distanceTo(p2);
+
+        if (dist < MAX_DISTANCE) {
+          linePositions.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+          // Assign identical random phase anchor to both vertices of the line segment
+          const rnd = Math.random();
+          lineOpacitiesArray.push(rnd, rnd);
+          connections++;
         }
+      }
     }
-    
+
     const lGeometry = new THREE.BufferGeometry();
     lGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
     lGeometry.setAttribute('aOpacity', new THREE.Float32BufferAttribute(lineOpacitiesArray, 1));
-    
+
     const lMaterial = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
@@ -165,7 +165,7 @@ window.GlobeSim = (function() {
       blending: THREE.AdditiveBlending,
       depthWrite: false
     });
-    
+
     lines = new THREE.LineSegments(lGeometry, lMaterial);
     globeGroup.add(lines);
 
@@ -186,68 +186,68 @@ window.GlobeSim = (function() {
     // 4. DATA FLOW SYSTEM (NODE EXTRACTION)
     // ==========================================
     glassPanel = document.querySelector('.glass-panel');
-    
+
     function spawnDataFlow() {
-        const idx = Math.floor(Math.random() * PARTICLE_COUNT);
-        const start = new THREE.Vector3(positions[idx*3], positions[idx*3+1], positions[idx*3+2]);
-        
-        // Sync with globe's current rotation/position
-        globeGroup.updateMatrixWorld();
-        start.applyMatrix4(globeGroup.matrixWorld);
-        
-        const isMobile = window.innerWidth < 768;
-        
-        // Target area: near the glass panel
-        const target = isMobile ? 
-            new THREE.Vector3((Math.random() - 0.5) * 5, -12 - Math.random() * 5, (Math.random() - 0.5) * 5) : // Mobile: Downward
-            new THREE.Vector3(-16 - Math.random() * 4, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 5);  // Desktop: Leftward
+      const idx = Math.floor(Math.random() * PARTICLE_COUNT);
+      const start = new THREE.Vector3(positions[idx * 3], positions[idx * 3 + 1], positions[idx * 3 + 2]);
 
-        // Curved path control point
-        const control = isMobile ?
-            new THREE.Vector3((start.x + target.x) / 1.5, start.y - (Math.random() * 8), (start.z + target.z) / 1.5) :
-            new THREE.Vector3((start.x + target.x) / 1.5, (start.y + target.y) / 1.5 + (Math.random() - 0.5) * 12, (start.z + target.z) / 1.5 + (Math.random() - 0.5) * 8);
+      // Sync with globe's current rotation/position
+      globeGroup.updateMatrixWorld();
+      start.applyMatrix4(globeGroup.matrixWorld);
 
-        // Particle Head
-        const headGeom = new THREE.SphereGeometry(0.04, 6, 6);
-        const headMat = new THREE.MeshBasicMaterial({ 
-            color: 0xc8ff00, 
-            transparent: true, 
-            blending: THREE.AdditiveBlending 
-        });
-        const head = new THREE.Mesh(headGeom, headMat);
-        scene.add(head);
+      const isMobile = window.innerWidth < 768;
 
-        // Trail - using multiple segment lines for smooth curves
-        const trailSegments = 12;
-        const trailPositions = new Float32Array(trailSegments * 3);
-        const trailGeom = new THREE.BufferGeometry();
-        trailGeom.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
-        const trailMat = new THREE.LineBasicMaterial({
-            color: 0x00f5ff, // Cyan trail
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-        const trailLine = new THREE.Line(trailGeom, trailMat);
-        scene.add(trailLine);
+      // Target area: near the glass panel
+      const target = isMobile ?
+        new THREE.Vector3((Math.random() - 0.5) * 5, -12 - Math.random() * 5, (Math.random() - 0.5) * 5) : // Mobile: Downward
+        new THREE.Vector3(-16 - Math.random() * 4, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 5);  // Desktop: Leftward
 
-        dataFlows.push({
-            head,
-            trailLine,
-            trailPositions,
-            path: { start, control, target },
-            progress: 0,
-            speed: 0.004 + Math.random() * 0.008,
-            history: [] // To store points for trail
-        });
+      // Curved path control point
+      const control = isMobile ?
+        new THREE.Vector3((start.x + target.x) / 1.5, start.y - (Math.random() * 8), (start.z + target.z) / 1.5) :
+        new THREE.Vector3((start.x + target.x) / 1.5, (start.y + target.y) / 1.5 + (Math.random() - 0.5) * 12, (start.z + target.z) / 1.5 + (Math.random() - 0.5) * 8);
+
+      // Particle Head
+      const headGeom = new THREE.SphereGeometry(0.04, 6, 6);
+      const headMat = new THREE.MeshBasicMaterial({
+        color: 0xc8ff00,
+        transparent: true,
+        blending: THREE.AdditiveBlending
+      });
+      const head = new THREE.Mesh(headGeom, headMat);
+      scene.add(head);
+
+      // Trail - using multiple segment lines for smooth curves
+      const trailSegments = 12;
+      const trailPositions = new Float32Array(trailSegments * 3);
+      const trailGeom = new THREE.BufferGeometry();
+      trailGeom.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+      const trailMat = new THREE.LineBasicMaterial({
+        color: 0x00f5ff, // Cyan trail
+        transparent: true,
+        opacity: 0.6,
+        blending: THREE.AdditiveBlending
+      });
+      const trailLine = new THREE.Line(trailGeom, trailMat);
+      scene.add(trailLine);
+
+      dataFlows.push({
+        head,
+        trailLine,
+        trailPositions,
+        path: { start, control, target },
+        progress: 0,
+        speed: 0.004 + Math.random() * 0.008,
+        history: [] // To store points for trail
+      });
     }
 
     // Initial burst
-    for(let i=0; i<15; i++) spawnDataFlow();
-    
+    for (let i = 0; i < 15; i++) spawnDataFlow();
+
     // Continuous spawn loop
     setInterval(() => {
-        if (dataFlows.length < 40) spawnDataFlow();
+      if (dataFlows.length < 40) spawnDataFlow();
     }, 400);
 
     // ==========================================
@@ -277,14 +277,14 @@ window.GlobeSim = (function() {
 
   function animate() {
     requestAnimationFrame(animate);
-    
+
     time += 0.01;
 
     mouseX += (targetX - mouseX) * 0.05;
     mouseY += (targetY - mouseY) * 0.05;
 
     // Continuous smooth rotation mixed with Parallax
-    globeGroup.rotation.y += 0.001; 
+    globeGroup.rotation.y += 0.001;
     globeGroup.rotation.x = mouseY * 0.15;
     globeGroup.rotation.z = -mouseX * 0.15;
 
@@ -294,56 +294,56 @@ window.GlobeSim = (function() {
     // Update custom shaders
     if (points && points.material) points.material.uniforms.time.value = time;
     if (lines && lines.material) lines.material.uniforms.time.value = time;
-    
+
     // Update advanced data flows
     for (let i = dataFlows.length - 1; i >= 0; i--) {
-        const df = dataFlows[i];
-        df.progress += df.speed;
+      const df = dataFlows[i];
+      df.progress += df.speed;
 
-        // Quadratic Bezier calculation
-        const t = df.progress;
-        const invT = 1 - t;
+      // Quadratic Bezier calculation
+      const t = df.progress;
+      const invT = 1 - t;
 
-        // Current World position of source (globe rotates, but particle detaches)
-        // For cinematically "detaching", we use the initial start point but account for globe rotation AT SPAWN.
-        // Or if we want them to feel like they follow the globe's rotation initially, we apply it.
-        // Let's keep them as world-space travelers after launch.
-        
-        const pos = new THREE.Vector3();
-        pos.x = invT * invT * df.path.start.x + 2 * invT * t * df.path.control.x + t * t * df.path.target.x;
-        pos.y = invT * invT * df.path.start.y + 2 * invT * t * df.path.control.y + t * t * df.path.target.y;
-        pos.z = invT * invT * df.path.start.z + 2 * invT * t * df.path.control.z + t * t * df.path.target.z;
+      // Current World position of source (globe rotates, but particle detaches)
+      // For cinematically "detaching", we use the initial start point but account for globe rotation AT SPAWN.
+      // Or if we want them to feel like they follow the globe's rotation initially, we apply it.
+      // Let's keep them as world-space travelers after launch.
 
-        df.head.position.copy(pos);
-        df.head.scale.setScalar(Math.sin(t * Math.PI) * (1.5 - t)); // Depth/progress based size
-        df.head.material.opacity = Math.sin(t * Math.PI) * 1.5;
+      const pos = new THREE.Vector3();
+      pos.x = invT * invT * df.path.start.x + 2 * invT * t * df.path.control.x + t * t * df.path.target.x;
+      pos.y = invT * invT * df.path.start.y + 2 * invT * t * df.path.control.y + t * t * df.path.target.y;
+      pos.z = invT * invT * df.path.start.z + 2 * invT * t * df.path.control.z + t * t * df.path.target.z;
 
-        // Update trail
-        df.history.push(pos.clone());
-        if (df.history.length > 12) df.history.shift();
+      df.head.position.copy(pos);
+      df.head.scale.setScalar(Math.sin(t * Math.PI) * (1.5 - t)); // Depth/progress based size
+      df.head.material.opacity = Math.sin(t * Math.PI) * 1.5;
 
-        for (let j = 0; j < 12; j++) {
-            const p = df.history[j] || pos;
-            df.trailPositions[j * 3] = p.x;
-            df.trailPositions[j * 3 + 1] = p.y;
-            df.trailPositions[j * 3 + 2] = p.z;
+      // Update trail
+      df.history.push(pos.clone());
+      if (df.history.length > 12) df.history.shift();
+
+      for (let j = 0; j < 12; j++) {
+        const p = df.history[j] || pos;
+        df.trailPositions[j * 3] = p.x;
+        df.trailPositions[j * 3 + 1] = p.y;
+        df.trailPositions[j * 3 + 2] = p.z;
+      }
+      df.trailLine.geometry.attributes.position.needsUpdate = true;
+      df.trailLine.material.opacity = Math.sin(t * Math.PI) * 0.5;
+
+      if (df.progress >= 1) {
+        // Impact!
+        if (glassPanel) {
+          glassPanel.style.boxShadow = '0 0 50px rgba(200, 255, 0, 0.3)';
+          setTimeout(() => {
+            if (glassPanel) glassPanel.style.boxShadow = '';
+          }, 100);
         }
-        df.trailLine.geometry.attributes.position.needsUpdate = true;
-        df.trailLine.material.opacity = Math.sin(t * Math.PI) * 0.5;
 
-        if (df.progress >= 1) {
-            // Impact!
-            if (glassPanel) {
-                glassPanel.style.boxShadow = '0 0 50px rgba(200, 255, 0, 0.3)';
-                setTimeout(() => {
-                    if(glassPanel) glassPanel.style.boxShadow = '';
-                }, 100);
-            }
-            
-            scene.remove(df.head);
-            scene.remove(df.trailLine);
-            dataFlows.splice(i, 1);
-        }
+        scene.remove(df.head);
+        scene.remove(df.trailLine);
+        dataFlows.splice(i, 1);
+      }
     }
 
     // Zooming behavior synced to scroll phase
@@ -355,14 +355,14 @@ window.GlobeSim = (function() {
 
   return {
     init: init,
-    setZoom: function(zoom) {
+    setZoom: function (zoom) {
       targetZoom = Math.max(1, zoom);
     }
   };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        if (typeof window.GlobeSim !== 'undefined') window.GlobeSim.init();
-    }, 100);
+  setTimeout(() => {
+    if (typeof window.GlobeSim !== 'undefined') window.GlobeSim.init();
+  }, 100);
 });

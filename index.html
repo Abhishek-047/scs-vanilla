@@ -62,41 +62,107 @@
         
         <!-- HERO SECTION -->
         <section class="landing-hero" id="hero-section">
-          
+
+          <!-- FULL-BLEED VIDEO BG (parallax layer) -->
           <div class="hero-bg" id="hacker-container">
             <video id="hackerVideo" autoplay muted loop playsinline>
               <source src="assets/video/hacker.mp4" type="video/mp4">
             </video>
           </div>
+          <!-- Layered gradient overlay: dark left → transparent right -->
           <div class="overlay"></div>
-          
+
+          <!-- ═══ HERO CONTENT GRID ═══ -->
           <div class="hero-content" id="hero-content">
+
+            <!-- ─── LEFT COLUMN ─── -->
             <div class="hero-text-col" id="hero-text">
-              <div class="glass-panel">
-                <div style="font-family: var(--font-mono); font-size: 12px; color: var(--dim); margin-bottom: 20px; letter-spacing: 2px;">[ SYSTEM NODE ]</div>
-                <h1 class="landing-title" style="margin-bottom: 20px; font-size: 4rem;">
+
+              <!-- Floating Status Bar (top of panel) -->
+              <div class="h-status-bar hero-float-el" id="h-status-bar">
+                <span class="h-status-dot"></span>
+                <span class="h-status-label">SCS NODE ACTIVE</span>
+                <span class="h-status-sep">|</span>
+                <span class="h-status-val" id="h-node-id">NODE_0x2F4A</span>
+              </div>
+
+              <!-- Main Glass Panel -->
+              <div class="glass-panel hero-float-el" style="--float-delay:0.1s">
+
+                <!-- Eyebrow label -->
+                <div class="h-eyebrow">
+                  <span class="h-eyebrow-icon">◈</span>
+                  <span>SOCIETY OF CYBER SECURITY</span>
+                </div>
+
+                <!-- Title -->
+                <h1 class="landing-title">
                   <span class="title-cyber" data-text="Cyber Security">Cyber Security</span>
                 </h1>
-                <p style="color: var(--dim-light); font-size: 16px; line-height: 1.6; margin-bottom: 32px; font-family: var(--font-mono);">
-                  Advanced threat intelligence and offensive security operations.<br>
+
+                <!-- Subtitle -->
+                <p class="h-subtitle">
+                  Advanced threat intelligence and offensive security operations.
                   Establishing connection to the central network node...
                 </p>
+
+                <!-- Divider line -->
+                <div class="h-divider"></div>
+
+                <!-- CTA row -->
                 <div class="landing-cta sr visible">
                   <a href="join.html" class="btn-fill magnetic-btn">JOIN SCS</a>
                   <a href="terminal.html" class="btn-ghost magnetic-btn">ACCESS TERMINAL</a>
                 </div>
               </div>
+
+              <!-- Floating mini panels (decorative system UI) -->
+              <div class="h-mini-panels">
+
+                <!-- Threat counter -->
+                <div class="h-mini-card hero-float-el" style="--float-delay:0.25s" id="h-threat-card">
+                  <div class="h-mini-card-label">// THREATS BLOCKED</div>
+                  <div class="h-mini-card-val" id="h-threat-val">2,847</div>
+                  <div class="h-mini-card-bar">
+                    <div class="h-mini-card-bar-fill" id="h-threat-bar"></div>
+                  </div>
+                </div>
+
+                <!-- Live log -->
+                <div class="h-mini-card h-mini-card--log hero-float-el" style="--float-delay:0.4s">
+                  <div class="h-mini-card-label">// LIVE FEED</div>
+                  <div class="h-log-lines" id="h-log-lines">
+                    <div class="h-log-line"><span class="h-log-ok">[OK]</span> auth.scs — verified</div>
+                    <div class="h-log-line"><span class="h-log-warn">[!]</span>&nbsp; scan.int — running</div>
+                    <div class="h-log-line"><span class="h-log-ok">[OK]</span> firewall — active</div>
+                  </div>
+                </div>
+
+              </div><!-- /.h-mini-panels -->
+
+            </div><!-- /.hero-text-col -->
+
+            <!-- ─── RIGHT COLUMN: GLOBE ─── -->
+            <div class="hero-globe-col" id="globe-container">
+              <!-- Soft ambient glow ring behind the globe -->
+              <div class="h-globe-glow"></div>
+              <!-- Corner UI brackets -->
+              <div class="h-globe-bracket h-globe-bracket--tl"></div>
+              <div class="h-globe-bracket h-globe-bracket--tr"></div>
+              <div class="h-globe-bracket h-globe-bracket--bl"></div>
+              <div class="h-globe-bracket h-globe-bracket--br"></div>
             </div>
-            
-            <div class="hero-globe-col" id="globe-container"></div>
-          </div>
-          
+
+          </div><!-- /.hero-content -->
+
           <!-- Scroll Indicator -->
           <div class="landing-scroll" id="scroll-indicator">
             <span>Scroll to enter</span>
             <div class="landing-scroll-line"></div>
           </div>
+
         </section>
+
 
         <!-- TERMINAL TRANSITION SECTION -->
         <div class="transition-section" id="transition-section" style="position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background: #000; z-index: 50; opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; flex-direction: column;">
