@@ -57,6 +57,13 @@
   z-index: -2;
   pointer-events: none;
   opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Hide particles on landing page — video is the background */
+.landing-page #three-canvas {
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
 /* ===== NAVBAR - FLOATING CYBERPUNK ===== */
@@ -338,6 +345,12 @@ main {
   position: relative;
   z-index: 5;
   padding-top: 100px;
+}
+
+/* Landing page: nav is floating, so main needs NO top padding */
+/* Video must bleed all the way to top edge of viewport */
+.landing-page main {
+  padding-top: 0 !important;
 }
 
 /* ===== FOOTER ===== */

@@ -22,8 +22,10 @@
   <link rel="stylesheet" href="assets/css/terminal.css">
   <link rel="stylesheet" href="assets/css/terminal-page.css">
   <link rel="stylesheet" href="assets/css/astrasec.css">
+  <link rel="stylesheet" href="assets/css/live-panel.css">
+  <link rel="stylesheet" href="assets/css/threatmap.css">
 </head>
-<body>
+<body class="landing-page">
 
   <!-- CURSOR -->
   <div id="c-dot"></div>
@@ -82,13 +84,6 @@
             <!-- ─── LEFT COLUMN ─── -->
             <div class="hero-text-col" id="hero-text">
 
-              <!-- Floating Status Bar (top of panel) -->
-              <div class="h-status-bar hero-float-el" id="h-status-bar">
-                <span class="h-status-dot"></span>
-                <span class="h-status-label">ASTRA SEC NODE ACTIVE</span>
-                <span class="h-status-sep">|</span>
-                <span class="h-status-val" id="h-node-id">NODE_0x2F4A</span>
-              </div>
 
               <!-- Main Glass Panel -->
               <div class="glass-panel hero-float-el" style="--float-delay:0.1s">
@@ -120,29 +115,68 @@
                 </div>
               </div>
 
-              <!-- Floating mini panels (decorative system UI) -->
-              <div class="h-mini-panels">
+              <!-- ─── LIVE INTEL PANEL (combined) ─── -->
+              <div class="h-live-panel hero-float-el" style="--float-delay:0.25s" id="h-live-panel">
 
-                <!-- Threat counter -->
-                <div class="h-mini-card hero-float-el" style="--float-delay:0.25s" id="h-threat-card">
-                  <div class="h-mini-card-label">// THREATS BLOCKED</div>
-                  <div class="h-mini-card-val" id="h-threat-val">2,847</div>
-                  <div class="h-mini-card-bar">
-                    <div class="h-mini-card-bar-fill" id="h-threat-bar"></div>
+                <!-- Panel header bar -->
+                <div class="h-live-panel-header">
+                  <span class="h-live-dot"></span>
+                  <span class="h-live-title">ASTRA SEC // LIVE INTEL</span>
+                  <span class="h-live-ts" id="h-live-ts">--:--:--</span>
+                </div>
+
+                <!-- Threats blocked row -->
+                <div class="h-live-threats">
+                  <div class="h-live-section-label">// THREATS BLOCKED</div>
+                  <div class="h-live-threat-row">
+                    <span class="h-live-threat-val" id="h-threat-val">0</span>
+                    <span class="h-live-threat-delta" id="h-threat-delta">+0/min</span>
+                  </div>
+                  <div class="h-live-bar">
+                    <div class="h-live-bar-fill" id="h-threat-bar"></div>
+                    <div class="h-live-bar-pulse" id="h-threat-bar-pulse"></div>
+                  </div>
+                  <!-- Sub-stats row -->
+                  <div class="h-live-substats">
+                    <div class="h-live-stat">
+                      <span class="h-live-stat-val" id="h-stat-ddos">0</span>
+                      <span class="h-live-stat-lbl">DDoS</span>
+                    </div>
+                    <div class="h-live-stat">
+                      <span class="h-live-stat-val" id="h-stat-malware">0</span>
+                      <span class="h-live-stat-lbl">Malware</span>
+                    </div>
+                    <div class="h-live-stat">
+                      <span class="h-live-stat-val" id="h-stat-phish">0</span>
+                      <span class="h-live-stat-lbl">Phishing</span>
+                    </div>
+                    <div class="h-live-stat">
+                      <span class="h-live-stat-val" id="h-stat-brute">0</span>
+                      <span class="h-live-stat-lbl">Brute Force</span>
+                    </div>
                   </div>
                 </div>
 
-                <!-- Live log -->
-                <div class="h-mini-card h-mini-card--log hero-float-el" style="--float-delay:0.4s">
-                  <div class="h-mini-card-label">// LIVE FEED</div>
-                  <div class="h-log-lines" id="h-log-lines">
-                    <div class="h-log-line"><span class="h-log-ok">[OK]</span> auth.astrasec — verified</div>
-                    <div class="h-log-line"><span class="h-log-warn">[!]</span>&nbsp; scan.int — running</div>
-                    <div class="h-log-line"><span class="h-log-ok">[OK]</span> firewall — active</div>
+                <!-- Divider -->
+                <div class="h-live-divider"></div>
+
+                <!-- Mini Threat Map -->
+                <div class="h-live-log-section">
+                  <div class="h-live-section-label">// ATTACK MAP
+                    <span class="h-live-blink">●</span>
+                    <span class="h-threatmap-legend">
+                      <span class="h-tl-dot" style="background:#ff5f56"></span>DDoS
+                      <span class="h-tl-dot" style="background:#ffb800"></span>Malware
+                      <span class="h-tl-dot" style="background:#00f5ff"></span>Phish
+                    </span>
+                  </div>
+                  <div class="h-threatmap-wrap">
+                    <canvas id="h-threatmap" class="h-threatmap-canvas"></canvas>
+                    <div class="h-threatmap-last" id="h-threatmap-last"></div>
                   </div>
                 </div>
 
-              </div><!-- /.h-mini-panels -->
+              </div><!-- /.h-live-panel -->
 
             </div><!-- /.hero-text-col -->
 
@@ -182,9 +216,9 @@
           <div class="terminal-fullscreen" style="background: rgba(5,5,8,0.95); backdrop-filter: blur(10px);">
             <div class="terminal-header-bar">
               <div class="terminal-dots">
-                <span class="terminal-dot red"></span>
-                <span class="terminal-dot yellow"></span>
-                <span class="terminal-dot green"></span>
+                <span class="terminal-dot red" id="t-dot-close" title="Close Terminal"></span>
+                <span class="terminal-dot yellow" id="t-dot-minimize" title="Minimize"></span>
+                <span class="terminal-dot green" id="t-dot-fullscreen" title="Fullscreen"></span>
               </div>
               <div class="terminal-title-bar">
                 <span class="terminal-icon">⬢</span>
@@ -202,14 +236,14 @@
                 <div class="terminal-ascii astra-sec-banner">
 <span class="astra-banner-line">╔══════════════════════════════════════════════════════════════════════════════╗</span>
 <span class="astra-banner-line">║                                                                              ║</span>
-<span class="astra-banner-line">║    ██████╗  ██████╗████████╗██████╗  █████╗      ███████╗███████╗ ██████╗   ║</span>
-<span class="astra-banner-line">║   ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗     ██╔════╝██╔════╝██╔════╝   ║</span>
-<span class="astra-banner-line">║   ███████║╚█████╗    ██║   ██████╔╝███████║     ███████╗█████╗  ██║        ║</span>
-<span class="astra-banner-line">║   ██╔══██║ ╚═══██╗   ██║   ██╔══██╗██╔══██║     ╚════██║██╔══╝  ██║        ║</span>
-<span class="astra-banner-line">║   ██║  ██║██████╔╝   ██║   ██║  ██║██║  ██║     ███████║███████╗╚██████╗   ║</span>
-<span class="astra-banner-line">║   ╚═╝  ╚═╝╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝     ╚══════╝╚══════╝ ╚═════╝   ║</span>
+<span class="astra-banner-line">║    ██████╗  ██████╗████████╗██████╗  █████╗      ███████╗███████╗ ██████╗    ║</span>
+<span class="astra-banner-line">║   ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗     ██╔════╝██╔════╝██╔════╝     ║</span>
+<span class="astra-banner-line">║   ███████║╚█████╗    ██║   ██████╔╝███████║     ███████╗█████╗  ██║          ║</span>
+<span class="astra-banner-line">║   ██╔══██║ ╚═══██╗   ██║   ██╔══██╗██╔══██║     ╚════██║██╔══╝  ██║          ║</span>
+<span class="astra-banner-line">║   ██║  ██║██████╔╝   ██║   ██║  ██║██║  ██║     ███████║███████╗╚██████╗     ║</span>
+<span class="astra-banner-line">║   ╚═╝  ╚═╝╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝     ╚══════╝╚══════╝ ╚═════╝     ║</span>
 <span class="astra-banner-line">║                                                                              ║</span>
-<span class="astra-banner-line">║                ◈ ADVANCED THREAT INTELLIGENCE &amp; SECURITY OPS ◈              ║</span>
+<span class="astra-banner-line">║            ◈ ADVANCED THREAT INTELLIGENCE &amp; SECURITY OPS ◈               ║</span>
 <span class="astra-banner-line">║                                                                              ║</span>
 <span class="astra-banner-line">╚══════════════════════════════════════════════════════════════════════════════╝</span>
                 </div>
@@ -269,5 +303,8 @@
   <script src="assets/js/terminal.js"></script>
   <script src="assets/js/matrix.js"></script>
   <script src="assets/js/landing.js"></script>
+  <script src="assets/js/terminal-controls.js"></script>
+  <script src="assets/js/threatmap.js"></script>
+  <script src="assets/js/live-panel.js"></script>
 </body>
 </html>

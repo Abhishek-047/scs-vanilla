@@ -97,8 +97,9 @@
     state.videoScale += (state.targetVideoScale - state.videoScale) * (LERP_FACTOR * 0.4);
 
     if (els.hackerVideoContainer) {
-      const moveX = state.mouseX * 20;
-      const moveY = state.mouseY * 20;
+      // Reduced from 20px to 8px — hero-bg is oversized by 15% so this is safe
+      const moveX = state.mouseX * 8;
+      const moveY = state.mouseY * 8;
       els.hackerVideoContainer.style.transform = `translate(${moveX}px, ${moveY}px) scale(${state.videoScale})`;
     }
   }
@@ -276,56 +277,9 @@
   }
 
   // ===== HERO MICRO ANIMATIONS =====
+  // Note: threat counter, bar, and log are now handled by live-panel.js
   function initHeroMicroAnimations() {
-    // 1. Threat bar fill animation
-    const bar = document.getElementById('h-threat-bar');
-    if (bar) {
-      setTimeout(() => { bar.style.width = '78%'; }, 900);
-    }
-
-    // 2. Threat counter tick-up
-    const valEl = document.getElementById('h-threat-val');
-    if (valEl) {
-      let count = 0;
-      const target = 2847;
-      const step = Math.ceil(target / 60);
-      const ticker = setInterval(() => {
-        count = Math.min(count + step, target);
-        valEl.textContent = count.toLocaleString();
-        if (count >= target) clearInterval(ticker);
-      }, 20);
-    }
-
-    // 3. Live log cycling
-    const logContainer = document.getElementById('h-log-lines');
-    const logPool = [
-      { cls: 'h-log-ok', text: '[OK] auth.scs \u2014 verified' },
-      { cls: 'h-log-warn', text: '[!]\u00a0 scan.int \u2014 running' },
-      { cls: 'h-log-ok', text: '[OK] firewall \u2014 active' },
-      { cls: 'h-log-ok', text: '[OK] vpn.tun0 \u2014 encrypted' },
-      { cls: 'h-log-warn', text: '[!]\u00a0 probe.ext \u2014 detected' },
-      { cls: 'h-log-ok', text: '[OK] node.sync \u2014 complete' },
-      { cls: 'h-log-warn', text: '[!]\u00a0 geo.block \u2014 triggered' },
-      { cls: 'h-log-ok', text: '[OK] ssl.cert \u2014 valid' },
-    ];
-    let logIdx = 3;
-    if (logContainer) {
-      setInterval(() => {
-        const entry = logPool[logIdx % logPool.length];
-        logIdx++;
-        const lines = logContainer.querySelectorAll('.h-log-line');
-        // Shift: remove first, add new at end
-        if (lines.length >= 3) lines[0].remove();
-        const div = document.createElement('div');
-        div.className = 'h-log-line';
-        div.style.cssText = 'opacity:0;transition:opacity 0.4s ease;';
-        div.innerHTML = `<span class="${entry.cls}">${entry.text.split('\u2014')[0].trim()}</span> \u2014 ${entry.text.split('\u2014')[1].trim()}`;
-        logContainer.appendChild(div);
-        requestAnimationFrame(() => requestAnimationFrame(() => { div.style.opacity = '1'; }));
-      }, 2800);
-    }
-
-    // 4. Node ID hex ticker
+    // Node ID hex ticker (status bar)
     const nodeEl = document.getElementById('h-node-id');
     if (nodeEl) {
       setInterval(() => {

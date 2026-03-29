@@ -132,17 +132,41 @@
 /* Terminal Welcome / ASCII Art */
 .terminal-welcome {
   margin-bottom: 24px;
-  animation: fadeIn 0.5s ease;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .terminal-ascii {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  line-height: 1.2;
+  font-size: 11px;
+  line-height: 1.25;
   color: var(--acid);
   white-space: pre;
-  text-shadow: 0 0 10px rgba(200, 255, 0, 0.3);
+  text-shadow: 0 0 14px rgba(200, 255, 0, 0.5);
   overflow-x: auto;
+  display: block;
+}
+
+/* Astra Sec banner — bigger, bold glow, dramatic boot feel */
+.astra-sec-banner {
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: left;
+  overflow-x: auto;
+  padding: 4px 0 16px;
+  animation: banner-glow-in 1.2s ease forwards;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200,255,0,0.2) transparent;
+}
+
+@keyframes banner-glow-in {
+  0%   { opacity: 0; }
+  50%  { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
 .terminal-version {
@@ -388,6 +412,11 @@
   
   .terminal-ascii {
     font-size: 5px;
+  }
+
+  .astra-sec-banner {
+    font-size: 5px !important;
+    line-height: 1.15 !important;
   }
   
   .terminal-quick-commands {

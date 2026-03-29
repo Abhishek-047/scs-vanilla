@@ -6,27 +6,42 @@
 ──────────────────────────────────────────── */
 .astra-sec-banner {
   display: block;
-  font-size: 7.5px !important;
-  line-height: 1.25 !important;
-  letter-spacing: 0 !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.25;
+  letter-spacing: 0;
+  white-space: pre;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200,255,0,0.2) transparent;
 }
 
 .astra-banner-line {
   display: block;
   white-space: pre;
   color: var(--acid);
-  text-shadow: 0 0 12px rgba(200,255,0,0.5);
+  text-shadow: 0 0 18px rgba(200,255,0,0.7), 0 0 40px rgba(200,255,0,0.3);
+  transition: text-shadow 0.3s ease;
 }
 
-/* Subtle colour cascade on banner lines */
-.astra-banner-line:nth-child(1),
-.astra-banner-line:last-child { color: rgba(200,255,0,0.35); text-shadow: none; }
+/* Frame lines (top & bottom box) — dimmer */
+.astra-banner-line:first-child,
+.astra-banner-line:last-child {
+  color: rgba(200,255,0,0.3);
+  text-shadow: none;
+}
+/* Empty padding lines */
 .astra-banner-line:nth-child(2),
-.astra-banner-line:nth-last-child(2) { color: rgba(200,255,0,0.5); }
-.astra-banner-line:nth-child(10),
-.astra-banner-line:nth-child(11) {
+.astra-banner-line:nth-last-child(2) {
+  color: rgba(200,255,0,0.25);
+  text-shadow: none;
+}
+/* Middle tagline in cyan */
+.astra-banner-line:nth-last-child(3) {
   color: var(--ice);
-  text-shadow: 0 0 10px rgba(0,245,255,0.4);
+  text-shadow: 0 0 16px rgba(0,245,255,0.6), 0 0 40px rgba(0,245,255,0.2);
+  letter-spacing: 1px;
 }
 
 /* ─────────────────────────────────────────
@@ -156,21 +171,28 @@
 ──────────────────────────────────────────── */
 
 /* Section on inner pages needs top breathing room below floating nav */
-main > section:first-child,
-main > .section:first-child {
+/* Excluded from landing-page where the hero is full-bleed */
+body:not(.landing-page) main > section:first-child,
+body:not(.landing-page) main > .section:first-child {
   padding-top: calc(var(--space-4xl) + 60px);
 }
 
 /* ─────────────────────────────────────────
-   7. INNER PAGE BACKGROUND DEPTH GLOW
+   7. CANVAS VISIBILITY — LANDING vs INNER
 ──────────────────────────────────────────── */
 
-/* Three.js canvas shows on inner pages for ambient particle depth */
-body:not(.terminal-page) #three-canvas {
-  opacity: 0.6;
+/* Landing page: hide canvas — video is the only background */
+.landing-page #three-canvas {
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
-/* Premium depth gradient on inner pages */
+/* Inner pages (not landing, not terminal): subtle ambient particles */
+body:not(.landing-page):not(.terminal-page) #three-canvas {
+  opacity: 0.45;
+}
+
+/* Premium depth gradient on all non-terminal pages */
 body:not(.terminal-page)::before {
   background:
     radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139,92,246,0.08) 0%, transparent 70%),

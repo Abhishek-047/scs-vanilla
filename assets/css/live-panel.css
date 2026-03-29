@@ -1,0 +1,274 @@
+/* ===== ASTRA SEC — LIVE INTEL PANEL ===== */
+
+/* ─── Main panel container ─── */
+.h-live-panel {
+  width: 100%;
+  max-width: 580px;
+  background: rgba(6, 6, 12, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(200, 255, 0, 0.12);
+  border-top: 1px solid rgba(200, 255, 0, 0.28);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 16px 40px rgba(0,0,0,0.5),
+    0 0 30px rgba(200,255,0,0.04);
+  animation: hero-fade-up 0.8s cubic-bezier(0.16,1,0.3,1) forwards,
+             card-float 7s ease-in-out 0.8s infinite;
+  animation-delay: var(--float-delay, 0.25s), calc(var(--float-delay, 0.25s) + 0.8s);
+  opacity: 0;
+}
+
+/* Top-left acid accent */
+.h-live-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 50px; height: 2px;
+  background: linear-gradient(90deg, var(--acid), transparent);
+}
+
+/* ─── Header bar ─── */
+.h-live-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(200,255,0,0.07);
+}
+
+.h-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--acid);
+  box-shadow: 0 0 8px var(--acid);
+  flex-shrink: 0;
+  animation: sdot-pulse 1.5s ease-in-out infinite;
+}
+
+.h-live-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--acid);
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.h-live-ts {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+}
+
+/* ─── Threats section ─── */
+.h-live-threats {
+  padding: 12px 14px 10px;
+}
+
+.h-live-section-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(200,255,0,0.45);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.h-live-threat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.h-live-threat-val {
+  font-family: var(--font-syne);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--acid);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(200,255,0,0.4);
+  transition: text-shadow 0.3s ease;
+}
+
+.h-live-threat-delta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ice);
+  padding: 2px 6px;
+  background: rgba(0,245,255,0.08);
+  border: 1px solid rgba(0,245,255,0.15);
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  transition: all 0.4s ease;
+}
+
+/* ─── Progress bar ─── */
+.h-live-bar {
+  height: 3px;
+  background: rgba(200,255,0,0.06);
+  border-radius: 3px;
+  overflow: visible;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.h-live-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--acid), var(--ice));
+  border-radius: 3px;
+  transition: width 1.5s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 0 8px rgba(200,255,0,0.5);
+}
+
+.h-live-bar-pulse {
+  position: absolute;
+  top: -3px;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--acid);
+  box-shadow: 0 0 10px var(--acid);
+  animation: pulse-dot 1.2s ease-in-out infinite;
+  transition: right 1.5s cubic-bezier(0.16,1,0.3,1);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.6); }
+}
+
+/* ─── Sub-stats row ─── */
+.h-live-substats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.h-live-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 5px;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.h-live-stat:hover {
+  border-color: rgba(200,255,0,0.15);
+  background: rgba(200,255,0,0.03);
+}
+
+.h-live-stat-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.01em;
+  transition: color 0.3s ease;
+}
+
+.h-live-stat-lbl {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Flash animation when value updates */
+.h-live-stat-val.flash {
+  color: var(--acid);
+  text-shadow: 0 0 10px rgba(200,255,0,0.6);
+}
+
+/* ─── Divider ─── */
+.h-live-divider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(200,255,0,0.15),
+    rgba(0,245,255,0.1),
+    transparent);
+  margin: 0 14px;
+}
+
+/* ─── Live log section ─── */
+.h-live-log-section {
+  padding: 10px 14px 12px;
+}
+
+/* Blinking indicator dot */
+.h-live-blink {
+  color: #ff5f56;
+  animation: blink-red 1s step-end infinite;
+  font-size: 8px;
+}
+
+@keyframes blink-red {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Log lines — compact style */
+.h-log-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 66px;
+  overflow: hidden;
+}
+
+.h-log-line {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.35s ease;
+  animation: log-slide-in 0.3s ease forwards;
+}
+
+@keyframes log-slide-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.h-log-ok   { color: var(--acid); font-weight: 700; }
+.h-log-warn { color: #ffb800;     font-weight: 700; }
+.h-log-err  { color: #ff5f56;     font-weight: 700; }
+.h-log-info { color: var(--ice);  font-weight: 700; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .h-live-panel {
+    max-width: 100%;
+  }
+  .h-live-substats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  .h-live-threat-val {
+    font-size: 22px;
+  }
+}

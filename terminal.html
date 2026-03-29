@@ -33,13 +33,13 @@
   <div class="terminal-fullscreen">
     <div class="terminal-header-bar">
       <div class="terminal-dots">
-        <span class="terminal-dot red"></span>
-        <span class="terminal-dot yellow"></span>
-        <span class="terminal-dot green"></span>
+        <span class="terminal-dot red" id="t-dot-close" title="Close Terminal"></span>
+        <span class="terminal-dot yellow" id="t-dot-minimize" title="Minimize"></span>
+        <span class="terminal-dot green" id="t-dot-fullscreen" title="Fullscreen"></span>
       </div>
       <div class="terminal-title-bar">
         <span class="terminal-icon">⬢</span>
-        <span>guest@scs-terminal — bash</span>
+        <span>guest@astrasec-terminal — bash</span>
       </div>
       <div class="terminal-controls">
         <button class="terminal-btn" id="terminal-fullscreen-btn" title="Toggle Fullscreen">
@@ -112,5 +112,6 @@
   <script src="assets/js/animations.js"></script>
   <script src="assets/js/terminal.js"></script>
   <script src="assets/js/matrix.js"></script>
+  <script src="assets/js/terminal-controls.js"></script>
 </body>
 </html>

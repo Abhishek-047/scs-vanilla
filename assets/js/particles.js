@@ -12,6 +12,9 @@
     return;
   }
 
+  // Skip on landing page — hacker video is the background, no need for particles
+  if (document.body.classList.contains('landing-page')) return;
+
   var canvas = document.getElementById('three-canvas');
   if (!canvas) return;
 
