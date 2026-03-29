@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Society of Cyber Security — SCS Platform</title>
-  <meta name="description" content="SCS Platform - Advancing cybersecurity through research, education, and community. Join our elite team of security researchers.">
+  <title>Astra Sec — Cybersecurity Event</title>
+  <meta name="description" content="Astra Sec — Premier cybersecurity event. Advanced threat intelligence, offensive security operations, and elite security research.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="assets/css/landing.css">
   <link rel="stylesheet" href="assets/css/terminal.css">
   <link rel="stylesheet" href="assets/css/terminal-page.css">
+  <link rel="stylesheet" href="assets/css/astrasec.css">
 </head>
 <body>
 
@@ -34,8 +35,11 @@
   <!-- NAVBAR -->
   <nav id="navbar">
     <a href="index.html" class="nav-logo" id="nav-logo">
-      <div class="nav-logo-icon"><span>S</span></div>
-      <span>SCS</span>
+      <img src="assets/astrasec-logo.png" alt="Astra Sec Logo" class="nav-logo-img">
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Astra<span> Sec</span></span>
+        <span class="nav-logo-sub">Cyber Event</span>
+      </div>
     </a>
     <div class="nav-links">
       <a href="index.html" class="nav-link active">Home</a>
@@ -81,7 +85,7 @@
               <!-- Floating Status Bar (top of panel) -->
               <div class="h-status-bar hero-float-el" id="h-status-bar">
                 <span class="h-status-dot"></span>
-                <span class="h-status-label">SCS NODE ACTIVE</span>
+                <span class="h-status-label">ASTRA SEC NODE ACTIVE</span>
                 <span class="h-status-sep">|</span>
                 <span class="h-status-val" id="h-node-id">NODE_0x2F4A</span>
               </div>
@@ -92,7 +96,7 @@
                 <!-- Eyebrow label -->
                 <div class="h-eyebrow">
                   <span class="h-eyebrow-icon">◈</span>
-                  <span>SOCIETY OF CYBER SECURITY</span>
+                  <span>SOCIETY OF CYBER SECURITY — ASTRA SEC</span>
                 </div>
 
                 <!-- Title -->
@@ -111,7 +115,7 @@
 
                 <!-- CTA row -->
                 <div class="landing-cta sr visible">
-                  <a href="join.html" class="btn-fill magnetic-btn">JOIN SCS</a>
+                  <a href="join.html" class="btn-fill magnetic-btn">JOIN ASTRA SEC</a>
                   <a href="terminal.html" class="btn-ghost magnetic-btn">ACCESS TERMINAL</a>
                 </div>
               </div>
@@ -132,7 +136,7 @@
                 <div class="h-mini-card h-mini-card--log hero-float-el" style="--float-delay:0.4s">
                   <div class="h-mini-card-label">// LIVE FEED</div>
                   <div class="h-log-lines" id="h-log-lines">
-                    <div class="h-log-line"><span class="h-log-ok">[OK]</span> auth.scs — verified</div>
+                    <div class="h-log-line"><span class="h-log-ok">[OK]</span> auth.astrasec — verified</div>
                     <div class="h-log-line"><span class="h-log-warn">[!]</span>&nbsp; scan.int — running</div>
                     <div class="h-log-line"><span class="h-log-ok">[OK]</span> firewall — active</div>
                   </div>
@@ -184,7 +188,7 @@
               </div>
               <div class="terminal-title-bar">
                 <span class="terminal-icon">⬢</span>
-                <span>guest@scs-terminal — bash</span>
+                <span>guest@astrasec-terminal — bash</span>
               </div>
               <div class="terminal-controls">
                 <button class="terminal-btn" id="terminal-fullscreen-btn" title="Toggle Fullscreen">
@@ -195,33 +199,22 @@
             
             <div class="terminal-content" id="terminal-content">
               <div class="terminal-welcome" id="terminal-welcome">
-                <div class="terminal-ascii">
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║     █████╗  ██████╗████████╗███████╗██████╗ ████████╗███████╗██╗  ██╗      ║
-║    ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝╚██╗██╔╝      ║
-║    ███████║██║        ██║   █████╗  ██████╔╝   ██║   █████╗   ╚███╔╝       ║
-║    ██╔══██║██║        ██║   ██╔══╝  ██╔══██╗   ██║   ██╔══╝   ██╔██╗       ║
-║    ██║  ██║╚██████╗   ██║   ███████╗██║  ██║   ██║   ███████╗██╔╝ ██╗      ║
-║    ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝      ║
-║                      ███████╗ ██████╗ ██████╗  █████╗ ██████╗                ║
-║                      ██╔════╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗               ║
-║                      ███████╗██║   ██║██████╔╝███████║██████╔╝               ║
-║                      ╚════██║██║   ██║██╔══██╗██╔══██║██╔══██╗               ║
-║                      ███████║╚██████╔╝██║  ██║██║  ██║██║  ██║               ║
-║                      ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝               ║
-║                                                                              ║
-║                   ██████╗ ███████╗ █████╗ ██████╗                       ║
-║                   ██╔══██╗██╔════╝██╔══██╗██╔══██╗                      ║
-║                   ██████╔╝█████╗  ███████║██████╔╝                      ║
-║                   ██╔══██╗██╔══╝  ██╔══██║██╔══██╗                      ║
-║                   ██║  ██║███████╗██║  ██║██║  ██║                      ║
-║                   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝                      ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+                <div class="terminal-ascii astra-sec-banner">
+<span class="astra-banner-line">╔══════════════════════════════════════════════════════════════════════════════╗</span>
+<span class="astra-banner-line">║                                                                              ║</span>
+<span class="astra-banner-line">║    ██████╗  ██████╗████████╗██████╗  █████╗      ███████╗███████╗ ██████╗   ║</span>
+<span class="astra-banner-line">║   ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗     ██╔════╝██╔════╝██╔════╝   ║</span>
+<span class="astra-banner-line">║   ███████║╚█████╗    ██║   ██████╔╝███████║     ███████╗█████╗  ██║        ║</span>
+<span class="astra-banner-line">║   ██╔══██║ ╚═══██╗   ██║   ██╔══██╗██╔══██║     ╚════██║██╔══╝  ██║        ║</span>
+<span class="astra-banner-line">║   ██║  ██║██████╔╝   ██║   ██║  ██║██║  ██║     ███████║███████╗╚██████╗   ║</span>
+<span class="astra-banner-line">║   ╚═╝  ╚═╝╚═════╝    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝     ╚══════╝╚══════╝ ╚═════╝   ║</span>
+<span class="astra-banner-line">║                                                                              ║</span>
+<span class="astra-banner-line">║                ◈ ADVANCED THREAT INTELLIGENCE &amp; SECURITY OPS ◈              ║</span>
+<span class="astra-banner-line">║                                                                              ║</span>
+<span class="astra-banner-line">╚══════════════════════════════════════════════════════════════════════════════╝</span>
                 </div>
-                <div class="terminal-version">SCS Terminal v2.4.0 [Secure Build]</div>
-                <div class="terminal-copyright">© 2024 Society of Cyber Security. All rights reserved.</div>
+                <div class="terminal-version">Astra Sec Terminal v2.4.0 [Secure Build]</div>
+                <div class="terminal-copyright">© 2024 Astra Sec — Cybersecurity Event. All rights reserved.</div>
                 <div class="terminal-typewriter" id="typewriter-intro"></div>
               </div>
               
@@ -229,7 +222,7 @@
             </div>
             
             <div class="terminal-input-line">
-              <span class="terminal-prompt">guest@scs:~$</span>
+              <span class="terminal-prompt">guest@astrasec:~$</span>
               <input type="text" id="term-input" class="terminal-input" placeholder="Type a command..." autocomplete="off" spellcheck="false">
             </div>
             

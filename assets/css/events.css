@@ -3,7 +3,6 @@
 /* ===== EVENTS SECTION ===== */
 .events {
   position: relative;
-  background: var(--ink2);
   overflow: hidden;
 }
 

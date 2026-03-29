@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terminal — SCS Platform</title>
-  <meta name="description" content="Access the SCS Terminal - An interactive hacker console.">
+  <title>Terminal — Astra Sec</title>
+  <meta name="description" content="Access the Astra Sec Terminal - An interactive hacker console for cybersecurity event.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="assets/css/animations.css">
   <link rel="stylesheet" href="assets/css/terminal.css">
   <link rel="stylesheet" href="assets/css/terminal-page.css">
+  <link rel="stylesheet" href="assets/css/astrasec.css">
 </head>
 <body class="terminal-page">
 
@@ -49,33 +50,22 @@
     
     <div class="terminal-content" id="terminal-content">
       <div class="terminal-welcome" id="terminal-welcome">
-        <div class="terminal-ascii">
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║     █████╗  ██████╗████████╗███████╗██████╗ ████████╗███████╗██╗  ██╗      ║
-║    ██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝╚██╗██╔╝      ║
-║    ███████║██║        ██║   █████╗  ██████╔╝   ██║   █████╗   ╚███╔╝       ║
-║    ██╔══██║██║        ██║   ██╔══╝  ██╔══██╗   ██║   ██╔══╝   ██╔██╗       ║
-║    ██║  ██║╚██████╗   ██║   ███████╗██║  ██║   ██║   ███████╗██╔╝ ██╗      ║
-║    ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝      ║
-║                      ███████╗ ██████╗ ██████╗  █████╗ ██████╗                ║
-║                      ██╔════╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗               ║
-║                      ███████╗██║   ██║██████╔╝███████║██████╔╝               ║
-║                      ╚════██║██║   ██║██╔══██╗██╔══██║██╔══██╗               ║
-║                      ███████║╚██████╔╝██║  ██║██║  ██║██║  ██║               ║
-║                      ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝               ║
-║                                                                              ║
-║                   ██████╗ ███████╗ █████╗ ██████╗                       ║
-║                   ██╔══██╗██╔════╝██╔══██╗██╔══██╗                      ║
-║                   ██████╔╝█████╗  ███████║██████╔╝                      ║
-║                   ██╔══██╗██╔══╝  ██╔══██║██╔══██╗                      ║
-║                   ██║  ██║███████╗██║  ██║██║  ██║                      ║
-║                   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝                      ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+        <div class="terminal-ascii astra-sec-banner">
+<span class="astra-banner-line">╔══════════════════════════════════════════════════════════════════════════════╗</span>
+<span class="astra-banner-line">║                                                                              ║</span>
+<span class="astra-banner-line">║   ██████╗  ██████╗███████╗██████╗   █████╗      ███████╗███████╗██████╗    ║</span>
+<span class="astra-banner-line">║  ██╔══██╗██╔════╝██╔════╝██╔══██╗ ██╔══██╗     ██╔════╝██╔════╝██╔════╝    ║</span>
+<span class="astra-banner-line">║  ███████║╚█████╗  █████╗  ██████╔╝ ███████║     █████╗  █████╗  ██║        ║</span>
+<span class="astra-banner-line">║  ██╔══██║ ╚═══██╗ ██╔══╝  ██╔══██╗ ██╔══██║     ██╔══╝  ██╔══╝  ██║        ║</span>
+<span class="astra-banner-line">║  ██║  ██║██████╔╝ ███████╗██║  ██║ ██║  ██║     ███████╗███████╗╚██████╗   ║</span>
+<span class="astra-banner-line">║  ╚═╝  ╚═╝╚═════╝  ╚══════╝╚═╝  ╚═╝ ╚═╝  ╚═╝     ╚══════╝╚══════╝ ╚═════╝   ║</span>
+<span class="astra-banner-line">║                                                                              ║</span>
+<span class="astra-banner-line">║            [ CYBERSECURITY EVENT ] ◈ ADVANCED THREAT INTELLIGENCE ◈        ║</span>
+<span class="astra-banner-line">║                                                                              ║</span>
+<span class="astra-banner-line">╚══════════════════════════════════════════════════════════════════════════════╝</span>
         </div>
-        <div class="terminal-version">SCS Terminal v2.4.0 [Secure Build]</div>
-        <div class="terminal-copyright">© 2024 Society of Cyber Security. All rights reserved.</div>
+        <div class="terminal-version">Astra Sec Terminal v2.4.0 [Secure Build]</div>
+        <div class="terminal-copyright">© 2024 Astra Sec — Cybersecurity Event. All rights reserved.</div>
         <div class="terminal-typewriter" id="typewriter-intro"></div>
       </div>
       
@@ -85,7 +75,7 @@
     </div>
     
     <div class="terminal-input-line">
-      <span class="terminal-prompt">guest@scs:~$</span>
+      <span class="terminal-prompt">guest@astrasec:~$</span>
       <input type="text" id="term-input" class="terminal-input" placeholder="Type a command..." autocomplete="off" spellcheck="false">
     </div>
     

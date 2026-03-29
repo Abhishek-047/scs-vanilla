@@ -1,0 +1,204 @@
+/* ===== ASTRA SEC — GLOBAL ADDITIONS ===== */
+/* Branding updates, inner page background fixes, terminal banner  */
+
+/* ─────────────────────────────────────────
+   1. ASTRA SEC ASCII BANNER STYLING
+──────────────────────────────────────────── */
+.astra-sec-banner {
+  display: block;
+  font-size: 7.5px !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+.astra-banner-line {
+  display: block;
+  white-space: pre;
+  color: var(--acid);
+  text-shadow: 0 0 12px rgba(200,255,0,0.5);
+}
+
+/* Subtle colour cascade on banner lines */
+.astra-banner-line:nth-child(1),
+.astra-banner-line:last-child { color: rgba(200,255,0,0.35); text-shadow: none; }
+.astra-banner-line:nth-child(2),
+.astra-banner-line:nth-last-child(2) { color: rgba(200,255,0,0.5); }
+.astra-banner-line:nth-child(10),
+.astra-banner-line:nth-child(11) {
+  color: var(--ice);
+  text-shadow: 0 0 10px rgba(0,245,255,0.4);
+}
+
+/* ─────────────────────────────────────────
+   2. INNER PAGES — CONSISTENT DARK BG
+──────────────────────────────────────────── */
+
+/* All inner sections inherit the same deep dark bg as the home */
+.events,
+.team,
+.projects,
+.resources,
+.join {
+  background: transparent !important;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Add a subtle cyberpunk grid background to inner pages */
+.events::before,
+.team::before,
+.projects::before,
+.resources::before,
+.join::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(rgba(200,255,0,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,255,0,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Event cards glass look */
+.event-card {
+  background: rgba(18, 18, 30, 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.event-card:hover {
+  border-color: rgba(200,255,0,0.15) !important;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(200,255,0,0.04) !important;
+}
+
+/* Team cards glass look */
+.team-card {
+  background: rgba(18, 18, 30, 0.7) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Section text z-index fix so content sits above the grid bg */
+.section-header,
+.events-grid,
+.team-grid,
+.projects-grid,
+.resources-grid,
+.join-grid {
+  position: relative;
+  z-index: 1;
+}
+
+/* Container z-index */
+.container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─────────────────────────────────────────
+   3. INNER PAGE HERO-STYLE PAGE TITLES
+──────────────────────────────────────────── */
+
+/* Add a glowing top accent line on each inner page */
+.events.section::after,
+.team.section::after,
+.projects.section::after,
+.resources.section::after,
+.join.section::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 8%; right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,255,0,0.3), rgba(0,245,255,0.2), transparent);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────
+   4. FLOATING NAV — MOBILE RESPONSIVE FIX
+──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  #navbar {
+    width: calc(100% - 24px);
+    top: 10px;
+    padding: 10px 16px;
+  }
+
+  .nav-logo-sub {
+    display: none;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: rgba(5, 5, 8, 0.97);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-xl);
+    transition: right 0.4s var(--ease-expo);
+    border-left: 1px solid rgba(200,255,0,0.1);
+    z-index: 999;
+  }
+
+  .nav-links.active {
+    right: 0;
+  }
+}
+
+/* Terminal title bar Astra Sec style handled via HTML content update */
+
+/* ─────────────────────────────────────────
+   6. SECTION LABEL — STYLE CONSISTENCY
+──────────────────────────────────────────── */
+
+/* Section on inner pages needs top breathing room below floating nav */
+main > section:first-child,
+main > .section:first-child {
+  padding-top: calc(var(--space-4xl) + 60px);
+}
+
+/* ─────────────────────────────────────────
+   7. INNER PAGE BACKGROUND DEPTH GLOW
+──────────────────────────────────────────── */
+
+/* Three.js canvas shows on inner pages for ambient particle depth */
+body:not(.terminal-page) #three-canvas {
+  opacity: 0.6;
+}
+
+/* Premium depth gradient on inner pages */
+body:not(.terminal-page)::before {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139,92,246,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,245,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 85% 75%, rgba(255,45,107,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 50% 80%, rgba(200,255,0,0.04) 0%, transparent 50%);
+}
+
+/* ─────────────────────────────────────────
+   8. NAV LINKS — UPDATED ACTIVE JOIN STYLE
+──────────────────────────────────────────── */
+
+/* "Join" link styled as a pill button */
+.nav-link[href="join.html"] {
+  padding: 6px 14px;
+  border: 1px solid rgba(200,255,0,0.25);
+  border-radius: 6px;
+  color: var(--acid) !important;
+  transition: all 0.3s var(--ease-expo);
+}
+
+.nav-link[href="join.html"]:hover,
+.nav-link[href="join.html"].active {
+  background: rgba(200,255,0,0.1);
+  border-color: rgba(200,255,0,0.5);
+  box-shadow: 0 0 16px rgba(200,255,0,0.1);
+}
+
+.nav-link[href="join.html"]::after {
+  display: none; /* No underline for pill button */
+}
