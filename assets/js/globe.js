@@ -14,7 +14,7 @@ window.GlobeSim = (function () {
   let glassPanel;
 
   function init() {
-    const container = document.getElementById('globe-container');
+    const container = document.getElementById('globe-stage-canvas');
     if (!container || typeof THREE === 'undefined') return;
 
     scene = new THREE.Scene();
@@ -268,7 +268,7 @@ window.GlobeSim = (function () {
   }
 
   function onWindowResize() {
-    const container = document.getElementById('globe-container');
+    const container = document.getElementById('globe-stage-canvas');
     if (!container || !camera || !renderer) return;
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();

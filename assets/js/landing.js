@@ -53,6 +53,7 @@
     initMagneticButtons();
     initScrollReveals();
     initHeroMicroAnimations();
+    initSectionCardEffects();
   }
 
 
@@ -187,7 +188,7 @@
 
   // ===== 4. EFFECTS & UTILS =====
   function initTypingEffect() {
-    const fullText = "Secure. Protect. Exploit. Repeat.";
+    const fullText = "Booting red team energy, blue team discipline, and research-first culture.";
     let charIndex = 0;
 
     if (!els.typingText) return;
@@ -287,6 +288,22 @@
         nodeEl.textContent = `NODE_0x${hex}`;
       }, 4000);
     }
+  }
+
+  function initSectionCardEffects() {
+    const cards = document.querySelectorAll('.division-card, .project-card, .overview-card, .stat-card');
+    cards.forEach((card) => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) - 0.5;
+        const y = ((e.clientY - rect.top) / rect.height) - 0.5;
+        card.style.transform = `translateY(-8px) rotateX(${-y * 4}deg) rotateY(${x * 5}deg)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
   }
 
   function initEasterEggs() {

@@ -1,5 +1,5 @@
 /**
- * Astra Sec — Terminal Mac-style Traffic Light Controls
+ * SCS — Terminal Mac-style Traffic Light Controls
  * Red   → Close  (go back to hero / close tab)
  * Yellow → Minimize (collapse terminal to a slim title bar)
  * Green  → Fullscreen (native browser fullscreen toggle)
@@ -110,7 +110,7 @@
 
           // Indicate minimized state in title bar
           const titleSpan = terminalEl.querySelector('.terminal-title-bar span:last-child');
-          if (titleSpan) titleSpan.textContent = 'guest@astrasec-terminal — minimized';
+          if (titleSpan) titleSpan.textContent = 'guest@scs-terminal — minimized';
 
           dotMinimize.title = 'Restore';
 
@@ -130,7 +130,7 @@
           }, 100);
 
           const titleSpan = terminalEl.querySelector('.terminal-title-bar span:last-child');
-          if (titleSpan) titleSpan.textContent = 'guest@astrasec-terminal — bash';
+          if (titleSpan) titleSpan.textContent = 'guest@scs-terminal — bash';
 
           dotMinimize.title = 'Minimize';
         }
