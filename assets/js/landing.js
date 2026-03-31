@@ -184,8 +184,6 @@
     }
   }
 
-
-
   // ===== 4. EFFECTS & UTILS =====
   function initTypingEffect() {
     const fullText = "Booting red team energy, blue team discipline, and research-first culture.";
