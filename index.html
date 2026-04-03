@@ -4,27 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Society of Cyber Security — Elite Hacker Collective</title>
-  <meta name="description" content="Society of Cyber Security (SCS) — a cinematic, story-driven cybersecurity club experience. Builders, breakers, red-blue team enthusiasts.">
-
-  <!-- Google Fonts -->
+  <meta name="description" content="Society of Cyber Security (SCS) — cinematic, story-driven cybersecurity club. Builders, breakers, red-blue team enthusiasts.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
-
-  <!-- Cinematic CSS (main) -->
   <link rel="stylesheet" href="assets/css/cinematic.css">
-
-  <!-- Keep variables for other pages linking this -->
   <link rel="stylesheet" href="assets/css/variables.css">
 </head>
-
 <body class="cinematic-page">
 
-  <!-- ══ CUSTOM CURSOR ═══════════════════════════════════════ -->
+  <!-- CUSTOM CURSOR -->
   <div id="cin-cursor-dot"></div>
   <div id="cin-cursor-ring"></div>
 
-  <!-- ══ FLOATING NAVBAR ══════════════════════════════════════ -->
+  <!-- FLOATING NAVBAR -->
   <nav class="cin-navbar" id="cin-navbar">
     <a href="index.html" class="cin-nav-logo">SCS</a>
     <div class="cin-nav-links">
@@ -35,166 +28,123 @@
       <a href="resources.html" class="cin-nav-link">Resources</a>
       <a href="join.html"      class="cin-nav-link">Join</a>
     </div>
-    <div class="cin-nav-hamburger">
-      <span></span><span></span><span></span>
-    </div>
+    <div class="cin-nav-hamburger"><span></span><span></span><span></span></div>
   </nav>
 
-  <!-- ══ SCENE PROGRESS INDICATOR ════════════════════════════ -->
+  <!-- SCENE PROGRESS -->
   <div class="cin-progress" id="cin-progress" aria-hidden="true">
-    <div class="cin-progress-dot active" data-label="ENTRY"    title="Scene 1 — Entry"></div>
+    <div class="cin-progress-dot active" data-label="ENTRY"></div>
     <div class="cin-progress-line"></div>
-    <div class="cin-progress-dot"        data-label="DESK"     title="Scene 2 — Desk"></div>
+    <div class="cin-progress-dot" data-label="GLOBE"></div>
     <div class="cin-progress-line"></div>
-    <div class="cin-progress-dot"        data-label="MONITOR"  title="Scene 3 — Monitor"></div>
+    <div class="cin-progress-dot" data-label="PANELS"></div>
     <div class="cin-progress-line"></div>
-    <div class="cin-progress-dot"        data-label="TERMINAL" title="Scene 4 — Terminal"></div>
+    <div class="cin-progress-dot" data-label="TERMINAL"></div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       MAIN SCROLL CONTAINER — 500vh
-       ══════════════════════════════════════════════════════════ -->
+  <!-- SCROLL CONTAINER (500vh) -->
   <div class="cin-scroll-container" id="cin-scroll">
     <div class="cin-sticky">
 
-      <!-- ═══════════════════════════════════════════════════════
-           THREE.JS BACKGROUND CANVAS
-           ═══════════════════════════════════════════════════════ -->
+      <!-- BG: Three.js starfield canvas -->
       <canvas id="cin-bg-canvas" aria-hidden="true"></canvas>
 
-      <!-- ═══════════════════════════════════════════════════════
-           LAYER 1 — BACKGROUND: SPLINE 3D ROOM
-           ═══════════════════════════════════════════════════════ -->
-      <div class="cin-spline-room" id="cin-room">
-        <iframe
-          src="https://my.spline.design/virtualroomscene-voHEMP1BQoXYs7jc4X7JvV4W/"
-          frameborder="0"
-          width="100%"
-          height="100%"
-          title="3D Hacker Room"
-          loading="eager"
-          allow="autoplay"
-        ></iframe>
+      <!-- BG: Hacker video room -->
+      <div class="cin-video-room" id="cin-room">
+        <video id="cin-bg-video" autoplay muted loop playsinline>
+          <source src="assets/video/hacker.mp4" type="video/mp4">
+        </video>
+        <div class="cin-video-overlay"></div>
       </div>
 
-      <!-- Vignette overlay on room -->
-      <div class="cin-room-vignette"></div>
+      <!-- 3D Perspective grid floor -->
+      <canvas id="cin-grid-canvas" aria-hidden="true"></canvas>
 
-      <!-- 3D PERSPECTIVE GRID FLOOR (scene 2) -->
-      <div class="cin-3d-grid" aria-hidden="true"></div>
-
-      <!-- ═══════════════════════════════════════════════════════
-           LAYER 2 — SPLINE 3D GLOBE + ORBITS
-           ═══════════════════════════════════════════════════════ -->
-      <div class="cin-spline-globe" id="cin-globe">
+      <!-- GLOBE: Three.js 3D globe -->
+      <div class="cin-globe-wrap" id="cin-globe">
         <div class="cin-globe-glow"></div>
-        <iframe
-          src="https://my.spline.design/holographicearthwithdynamiclines-PouUElzLMmxYRqz8JzuBZCdg/"
-          frameborder="0"
-          width="100%"
-          height="100%"
-          title="Holographic Earth"
-          loading="lazy"
-        ></iframe>
-      </div>
-      <!-- Orbit decorations around the globe -->
-      <div class="cin-globe-orbit" aria-hidden="true">
-        <div class="cin-globe-orbit-ring"></div>
-        <div class="cin-globe-orbit-ring"></div>
-        <div class="cin-globe-orbit-dot"></div>
+        <canvas id="cin-globe-canvas"></canvas>
+        <!-- Orbital ring UI -->
+        <div class="cin-globe-hud">
+          <div class="cin-globe-hud-line cin-globe-hud-line--1"></div>
+          <div class="cin-globe-hud-line cin-globe-hud-line--2"></div>
+          <div class="cin-globe-hud-stat">
+            <span class="cin-globe-hud-val" id="cin-stat-threats">1,247</span>
+            <span class="cin-globe-hud-lbl">Threats Blocked</span>
+          </div>
+        </div>
       </div>
 
-      <!-- ═══════════════════════════════════════════════════════
-           SCENE 1 — ENTRY (0% → 25%)
-           ═══════════════════════════════════════════════════════ -->
-      <section class="cin-scene1" id="cin-s1" aria-label="Entry scene">
+      <!-- ═══ SCENE 1 — ENTRY ═══ -->
+      <section class="cin-scene1" id="cin-s1" aria-label="Entry">
 
         <div class="cin-entry-label">
           <span>Society of Cyber Security</span>
-          <span style="opacity:0.4">// RECRUITMENT NODE</span>
+          <span style="opacity:.4">// RECRUITMENT NODE</span>
         </div>
 
-        <h1 class="cin-entry-title">
-          <span>Elite</span>
-          <span class="word-cyber" data-text="Cyber">Cyber</span>
-          <span>Security.</span>
+        <h1 class="cin-entry-title" id="cin-title">
+          <span class="cin-title-line">Elite</span>
+          <span class="cin-title-line word-cyber" data-text="Cyber">Cyber</span>
+          <span class="cin-title-line">Security.</span>
         </h1>
 
-        <p class="cin-entry-sub">
+        <p class="cin-entry-sub" id="cin-sub">
           We build tools, break systems ethically, compete in CTFs,
           study real malware, and turn curiosity into real-world capability.
         </p>
 
-        <div class="cin-entry-cta">
-          <a href="join.html" class="cin-btn-primary" id="cta-join">Join SCS</a>
-          <a href="terminal.html" class="cin-btn-ghost" id="cta-terminal">Terminal Access</a>
+        <div class="cin-entry-cta" id="cin-cta">
+          <a href="join.html"     class="cin-btn-primary">Join SCS</a>
+          <a href="terminal.html" class="cin-btn-ghost">Terminal Access</a>
         </div>
 
-        <div class="cin-entry-scroll-hint">
+        <div class="cin-entry-scroll-hint" id="cin-scroll-hint">
           <span>Scroll to enter</span>
           <div class="cin-scroll-line"></div>
         </div>
 
       </section>
 
-      <!-- Right-side floating 3D stat cards (scene 1) -->
-      <div class="cin-s1-right" aria-hidden="true">
-        <div class="cin-s1-float-card" style="--card-delay:0s">
-          <div class="cin-s1-card-label">Members</div>
-          <div class="cin-s1-card-val">120+</div>
-          <div style="font-size:10px;color:var(--dim);margin-top:3px;">Active this semester</div>
-          <div class="cin-s1-card-bar">
-            <div class="cin-s1-card-bar-fill" style="width:80%"></div>
-          </div>
+      <!-- Floating right stat cards (scene 1) -->
+      <div class="cin-s1-cards" id="cin-s1-cards">
+        <div class="cin-float-card" style="--cd:0s">
+          <div class="cin-float-card-label">Members</div>
+          <div class="cin-float-card-val">120+</div>
+          <div class="cin-float-card-bar"><div style="width:80%"></div></div>
         </div>
-
-        <div class="cin-s1-float-card" style="--card-delay:0.15s">
-          <div class="cin-s1-card-label">CTFs Won</div>
-          <div class="cin-s1-card-val">34</div>
-          <div style="font-size:10px;color:var(--dim);margin-top:3px;">Regional &amp; national</div>
-          <div class="cin-s1-card-bar">
-            <div class="cin-s1-card-bar-fill" style="width:68%"></div>
-          </div>
+        <div class="cin-float-card" style="--cd:.12s">
+          <div class="cin-float-card-label">CTFs Won</div>
+          <div class="cin-float-card-val">34</div>
+          <div class="cin-float-card-bar"><div style="width:68%"></div></div>
         </div>
-
-        <div class="cin-s1-float-card" style="--card-delay:0.3s">
-          <div class="cin-s1-card-label">Projects Open</div>
-          <div class="cin-s1-card-val">18</div>
-          <div style="font-size:10px;color:var(--dim);margin-top:3px;">Research &amp; tools</div>
-          <div class="cin-s1-card-bar">
-            <div class="cin-s1-card-bar-fill" style="width:55%"></div>
-          </div>
+        <div class="cin-float-card" style="--cd:.24s">
+          <div class="cin-float-card-label">Projects</div>
+          <div class="cin-float-card-val">18</div>
+          <div class="cin-float-card-bar"><div style="width:55%"></div></div>
         </div>
       </div>
 
-      <!-- Mini stat cards bottom (scene 1, legacy) -->
-      <div class="cin-hero-mini-cards" id="cin-mini-cards" aria-hidden="true">
-        <div class="cin-mini-card" style="--card-delay:0.3s">
+      <!-- Bottom mini cards -->
+      <div class="cin-hero-mini-cards" id="cin-mini-cards">
+        <div class="cin-mini-card" style="--card-delay:.3s">
           <div class="cin-mini-card-label">Members</div>
           <div class="cin-mini-card-val">120+</div>
         </div>
-        <div class="cin-mini-card" style="--card-delay:0.5s">
+        <div class="cin-mini-card" style="--card-delay:.5s">
           <div class="cin-mini-card-label">CTFs Won</div>
           <div class="cin-mini-card-val">34</div>
         </div>
-        <div class="cin-mini-card" style="--card-delay:0.7s">
+        <div class="cin-mini-card" style="--card-delay:.7s">
           <div class="cin-mini-card-label">Projects</div>
           <div class="cin-mini-card-val">18</div>
         </div>
       </div>
 
-
-      <!-- ═══════════════════════════════════════════════════════
-           SCENE 2 UI — DESK (25% → 50%)
-           Globe appears, desk stats
-           ═══════════════════════════════════════════════════════ -->
-      <div class="cin-scene2-ui" id="cin-s2" aria-label="Desk stats">
+      <!-- ═══ SCENE 2 — DESK STATS ═══ -->
+      <div class="cin-scene2-ui" id="cin-s2">
         <div class="cin-desk-label">// LIVE INTEL FEED</div>
         <div class="cin-desk-stat-row">
-          <div class="cin-desk-stat">
-            <div class="cin-desk-stat-val" id="cin-stat-threats">1,247</div>
-            <div class="cin-desk-stat-lbl">Threats Blocked</div>
-          </div>
           <div class="cin-desk-stat">
             <div class="cin-desk-stat-val" id="cin-stat-nodes">94%</div>
             <div class="cin-desk-stat-lbl">Node Integrity</div>
@@ -203,154 +153,73 @@
             <div class="cin-desk-stat-val" id="cin-stat-ctf">#7</div>
             <div class="cin-desk-stat-lbl">CTF Round</div>
           </div>
+          <div class="cin-desk-stat">
+            <div class="cin-desk-stat-val">14</div>
+            <div class="cin-desk-stat-lbl">Honeypots Live</div>
+          </div>
         </div>
       </div>
 
+      <!-- ═══ SCENE 3 — HOLO PANELS ═══ -->
+      <div class="cin-holo-panels" id="cin-s3">
 
-      <!-- ═══════════════════════════════════════════════════════
-           SCENE 3 — MONITOR / HOLOGRAPHIC UI (50% → 75%)
-           Three floating glassmorphism 3D panels
-           ═══════════════════════════════════════════════════════ -->
-      <div class="cin-holo-panels" id="cin-s3" aria-label="Holographic monitor panels">
-
-        <!-- Panel 1 — About SCS -->
-        <article class="cin-holo-panel" style="--panel-delay:0s; --panel-base-y:0px;">
+        <article class="cin-holo-panel" style="--pd:0s">
           <div class="panel-scan"></div>
-
           <div class="cin-holo-panel-header">
-            <span class="panel-header-dot"></span>
-            About SCS
+            <span class="panel-header-dot"></span>About SCS
           </div>
-
           <div class="cin-holo-panel-body">
-            <p style="font-size:12px; color:var(--dim); line-height:1.8; margin-bottom:14px;">
-              Society of Cyber Security is an elite student hacker collective
-              focused on offense, defense, and research-first culture.
+            <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-bottom:14px;">
+              Elite student hacker collective focused on offense, defense, and research-first culture.
             </p>
-            <div class="panel-data-row">
-              <span>Founded</span>
-              <span>2019</span>
-            </div>
-            <div class="panel-data-row">
-              <span>Status</span>
-              <span>ACTIVE</span>
-            </div>
-            <div class="panel-data-row">
-              <span>Clearance</span>
-              <span>OPEN</span>
-            </div>
-            <div class="panel-data-row">
-              <span>Focus</span>
-              <span>Red + Blue</span>
-            </div>
-            <div class="panel-bar-track" style="margin-top:12px;">
-              <div class="panel-bar-fill" style="--bar-delay:0.4s; width:78%;"></div>
+            <div class="panel-data-row"><span>Founded</span><span>2019</span></div>
+            <div class="panel-data-row"><span>Status</span><span>ACTIVE</span></div>
+            <div class="panel-data-row"><span>Clearance</span><span>OPEN</span></div>
+            <div class="panel-data-row"><span>Focus</span><span>Red + Blue</span></div>
+            <div class="panel-bar-track" style="margin-top:12px">
+              <div class="panel-bar-fill" style="--bd:.4s;width:78%"></div>
             </div>
           </div>
         </article>
 
-        <!-- Panel 2 — System Status -->
-        <article class="cin-holo-panel" style="--panel-delay:0.15s; --panel-base-y:-6px;">
+        <article class="cin-holo-panel" style="--pd:.15s">
           <div class="panel-scan"></div>
-
           <div class="cin-holo-panel-header">
-            <span class="panel-header-dot"></span>
-            System Status
+            <span class="panel-header-dot"></span>System Status
           </div>
-
           <div class="cin-holo-panel-body">
-            <div class="panel-data-row">
-              <span>CPU</span>
-              <span id="hp-cpu">73%</span>
-            </div>
-            <div class="panel-bar-track">
-              <div class="panel-bar-fill" style="--bar-delay:0.2s; width:73%;"></div>
-            </div>
-
-            <div class="panel-data-row" style="margin-top:10px;">
-              <span>RAM</span>
-              <span>88%</span>
-            </div>
-            <div class="panel-bar-track">
-              <div class="panel-bar-fill" style="--bar-delay:0.3s; width:88%;"></div>
-            </div>
-
-            <div class="panel-data-row" style="margin-top:10px;">
-              <span>Network</span>
-              <span>SECURE</span>
-            </div>
-            <div class="panel-bar-track">
-              <div class="panel-bar-fill" style="--bar-delay:0.4s; width:95%;"></div>
-            </div>
-
-            <!-- Hex node grid -->
-            <div class="panel-hex-grid" style="margin-top:14px;">
-              <div class="panel-hex active" style="--hex-i:0">●</div>
-              <div class="panel-hex active" style="--hex-i:1">●</div>
-              <div class="panel-hex"        style="--hex-i:2">○</div>
-              <div class="panel-hex active" style="--hex-i:3">●</div>
-              <div class="panel-hex active" style="--hex-i:4">●</div>
-              <div class="panel-hex"        style="--hex-i:5">○</div>
-              <div class="panel-hex active" style="--hex-i:6">●</div>
-              <div class="panel-hex active" style="--hex-i:7">●</div>
-              <div class="panel-hex active" style="--hex-i:8">●</div>
-              <div class="panel-hex"        style="--hex-i:9">○</div>
-              <div class="panel-hex active" style="--hex-i:10">●</div>
-              <div class="panel-hex"        style="--hex-i:11">○</div>
-              <div class="panel-hex active" style="--hex-i:12">●</div>
-              <div class="panel-hex active" style="--hex-i:13">●</div>
-              <div class="panel-hex"        style="--hex-i:14">○</div>
+            <div class="panel-data-row"><span>CPU</span><span>73%</span></div>
+            <div class="panel-bar-track"><div class="panel-bar-fill" style="--bd:.2s;width:73%"></div></div>
+            <div class="panel-data-row" style="margin-top:10px"><span>RAM</span><span>88%</span></div>
+            <div class="panel-bar-track"><div class="panel-bar-fill" style="--bd:.3s;width:88%"></div></div>
+            <div class="panel-data-row" style="margin-top:10px"><span>Network</span><span>SECURE</span></div>
+            <div class="panel-bar-track"><div class="panel-bar-fill" style="--bd:.4s;width:95%"></div></div>
+            <div class="panel-hex-grid" style="margin-top:14px">
+              <div class="panel-hex active" style="--hi:0">●</div><div class="panel-hex active" style="--hi:1">●</div>
+              <div class="panel-hex" style="--hi:2">○</div><div class="panel-hex active" style="--hi:3">●</div>
+              <div class="panel-hex active" style="--hi:4">●</div><div class="panel-hex" style="--hi:5">○</div>
+              <div class="panel-hex active" style="--hi:6">●</div><div class="panel-hex active" style="--hi:7">●</div>
+              <div class="panel-hex" style="--hi:8">○</div><div class="panel-hex active" style="--hi:9">●</div>
             </div>
           </div>
         </article>
 
-        <!-- Panel 3 — Network Feed -->
-        <article class="cin-holo-panel" style="--panel-delay:0.3s; --panel-base-y:4px;">
+        <article class="cin-holo-panel" style="--pd:.3s">
           <div class="panel-scan"></div>
-
           <div class="cin-holo-panel-header">
-            <span class="panel-header-dot"></span>
-            Network Feed
+            <span class="panel-header-dot"></span>Network Feed
           </div>
-
           <div class="cin-holo-panel-body">
-            <div class="panel-net-row">
-              <span class="panel-net-dot online"></span>
-              <span>scs-main-node</span>
-              <span style="margin-left:auto;font-size:9px;color:var(--acid)">ONLINE</span>
-            </div>
-            <div class="panel-net-row">
-              <span class="panel-net-dot online"></span>
-              <span>red-team-lab</span>
-              <span style="margin-left:auto;font-size:9px;color:var(--acid)">ONLINE</span>
-            </div>
-            <div class="panel-net-row">
-              <span class="panel-net-dot warning"></span>
-              <span>honeypot-net</span>
-              <span style="margin-left:auto;font-size:9px;color:#ffb800">ALERT</span>
-            </div>
-            <div class="panel-net-row">
-              <span class="panel-net-dot online"></span>
-              <span>ctf-sandbox</span>
-              <span style="margin-left:auto;font-size:9px;color:var(--acid)">ONLINE</span>
-            </div>
-            <div class="panel-net-row">
-              <span class="panel-net-dot danger"></span>
-              <span>external-scanner</span>
-              <span style="margin-left:auto;font-size:9px;color:#ff4444">BLOCKED</span>
-            </div>
-            <div class="panel-net-row">
-              <span class="panel-net-dot online"></span>
-              <span>vpn-gateway</span>
-              <span style="margin-left:auto;font-size:9px;color:var(--acid)">ONLINE</span>
-            </div>
-
-            <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.05);">
-              <div style="font-size:9px;letter-spacing:2px;color:rgba(0,245,255,0.5);text-transform:uppercase;margin-bottom:8px;">// Data Transfer</div>
-              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim);">
-                <span>↑ 14.2 MB/s</span>
-                <span>↓ 8.7 MB/s</span>
-                <span style="color:var(--cyan)">ENCRYPTED</span>
+            <div class="panel-net-row"><span class="panel-net-dot online"></span><span>scs-main-node</span><span style="margin-left:auto;font-size:9px;color:var(--acid)">ONLINE</span></div>
+            <div class="panel-net-row"><span class="panel-net-dot online"></span><span>red-team-lab</span><span style="margin-left:auto;font-size:9px;color:var(--acid)">ONLINE</span></div>
+            <div class="panel-net-row"><span class="panel-net-dot warning"></span><span>honeypot-net</span><span style="margin-left:auto;font-size:9px;color:#ffb800">ALERT</span></div>
+            <div class="panel-net-row"><span class="panel-net-dot online"></span><span>ctf-sandbox</span><span style="margin-left:auto;font-size:9px;color:var(--acid)">ONLINE</span></div>
+            <div class="panel-net-row"><span class="panel-net-dot danger"></span><span>external-scanner</span><span style="margin-left:auto;font-size:9px;color:#ff4444">BLOCKED</span></div>
+            <div class="panel-net-row"><span class="panel-net-dot online"></span><span>vpn-gateway</span><span style="margin-left:auto;font-size:9px;color:var(--acid)">ONLINE</span></div>
+            <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05)">
+              <div style="font-size:9px;letter-spacing:2px;color:rgba(0,245,255,.5);text-transform:uppercase;margin-bottom:6px">// Data Transfer</div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim)">
+                <span>↑ 14.2 MB/s</span><span>↓ 8.7 MB/s</span><span style="color:var(--cyan)">ENCRYPTED</span>
               </div>
             </div>
           </div>
@@ -358,135 +227,82 @@
 
       </div><!-- /.cin-holo-panels -->
 
-
-      <!-- ═══════════════════════════════════════════════════════
-           TRANSITION TEXT — "entering secure system"
-           ═══════════════════════════════════════════════════════ -->
+      <!-- Entering text -->
       <div class="cin-entering-text" id="cin-entering" aria-hidden="true">
         <div class="cin-entering-inner">&gt; entering SCS secure system...</div>
       </div>
 
-
-      <!-- ═══════════════════════════════════════════════════════
-           SCENE 4 — TERMINAL (75% → 100%)
-           ═══════════════════════════════════════════════════════ -->
-      <div class="cin-terminal-overlay" id="cin-term" aria-label="SCS Terminal">
-
-        <!-- Matrix rain canvas -->
+      <!-- ═══ SCENE 4 — TERMINAL ═══ -->
+      <div class="cin-terminal-overlay" id="cin-term">
         <canvas id="cin-matrix" aria-hidden="true"></canvas>
-
-        <!-- Terminal window -->
         <div class="cin-terminal-window">
-
-          <!-- Title bar -->
           <div class="cin-term-titlebar">
             <div class="cin-term-dots">
-              <span class="cin-term-dot red"    id="cin-dot-close"  title="Close → scroll to top"></span>
-              <span class="cin-term-dot yellow" id="cin-dot-min"    title="Minimize"></span>
-              <span class="cin-term-dot green"  id="cin-dot-full"   title="Fullscreen"></span>
+              <span class="cin-term-dot red"    id="cin-dot-close"></span>
+              <span class="cin-term-dot yellow" id="cin-dot-min"></span>
+              <span class="cin-term-dot green"  id="cin-dot-full"></span>
             </div>
-            <div class="cin-term-title">
-              <span class="cin-term-icon">⬢</span>
-              guest@scs-terminal — bash
-            </div>
-            <div style="width:52px;"></div><!-- spacer -->
+            <div class="cin-term-title"><span class="cin-term-icon">⬢</span>guest@scs-terminal — bash</div>
+            <div style="width:52px"></div>
           </div>
-
-          <!-- Terminal body / output area -->
           <div class="cin-term-body" id="cin-term-body">
-
-            <!-- ASCII Banner -->
             <div class="cin-term-banner" aria-hidden="true">
 ╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
 ║   ███████╗ ██████╗███████╗                                   ║
 ║   ██╔════╝██╔════╝██╔════╝                                   ║
 ║   ███████╗██║     ███████╗                                   ║
 ║   ╚════██║██║     ╚════██║                                   ║
 ║   ███████║╚██████╗███████║                                   ║
 ║   ╚══════╝ ╚═════╝╚══════╝                                   ║
-║                                                              ║
 ║   :: Society of Cyber Security ::  Terminal v4.0.0           ║
-║   :: Ethical Hacking · CTF · Research · Red/Blue Team ::     ║
-║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝</div>
-
-            <!-- Meta lines -->
             <div class="cin-term-meta" id="cin-term-meta">
-              <div class="cin-term-meta-line">
-                <span class="accent">System:</span> SCS Secure Shell — Recruitment Build
-              </div>
-              <div class="cin-term-meta-line">
-                <span class="cyan">Session:</span>&nbsp;<span id="cin-session-id">------</span>
-              </div>
-              <div class="cin-term-meta-line">
-                <span class="accent">User:</span>&nbsp;guest &nbsp;|&nbsp;
-                <span class="cyan">Level:</span>&nbsp;0 (unauthenticated)
-              </div>
+              <div class="cin-term-meta-line"><span class="accent">System:</span> SCS Secure Shell — Recruitment Build</div>
+              <div class="cin-term-meta-line"><span class="cyan">Session:</span>&nbsp;<span id="cin-session-id">------</span></div>
+              <div class="cin-term-meta-line"><span class="accent">User:</span>&nbsp;guest &nbsp;|&nbsp;<span class="cyan">Level:</span>&nbsp;0 (unauthenticated)</div>
             </div>
-
-            <!-- Output -->
             <div class="cin-term-output" id="cin-term-output"></div>
-
-          </div><!-- /.cin-term-body -->
-
-          <!-- Input line -->
+          </div>
           <div class="cin-term-inputline">
             <span class="cin-term-prompt">guest@scs:~$</span>
-            <input
-              type="text"
-              id="cin-term-input"
-              class="cin-term-input"
-              placeholder="Type a command or press a button below…"
-              autocomplete="off"
-              spellcheck="false"
-              aria-label="Terminal input"
-            >
+            <input type="text" id="cin-term-input" class="cin-term-input"
+              placeholder="Type a command…" autocomplete="off" spellcheck="false" aria-label="Terminal input">
           </div>
-
-          <!-- Quick command buttons -->
           <div class="cin-term-quickbar">
-            <button class="cin-quick-btn" data-cmd="help"     aria-label="help">help</button>
-            <button class="cin-quick-btn" data-cmd="whoami"   aria-label="whoami">whoami</button>
-            <button class="cin-quick-btn" data-cmd="ls"       aria-label="ls">ls</button>
-            <button class="cin-quick-btn" data-cmd="status"   aria-label="status">status</button>
-            <button class="cin-quick-btn" data-cmd="nmap"     aria-label="nmap">nmap</button>
-            <button class="cin-quick-btn" data-cmd="scan"     aria-label="scan">scan</button>
-            <button class="cin-quick-btn" data-cmd="hack"     aria-label="hack">hack</button>
-            <button class="cin-quick-btn" data-cmd="decrypt"  aria-label="decrypt">decrypt</button>
-            <button class="cin-quick-btn" data-cmd="ctf"      aria-label="ctf">ctf</button>
-            <button class="cin-quick-btn" data-cmd="projects" aria-label="projects">projects</button>
-            <button class="cin-quick-btn" data-cmd="join"     aria-label="join">join</button>
-            <button class="cin-quick-btn" data-cmd="clear"    aria-label="clear">clear</button>
+            <button class="cin-quick-btn" data-cmd="help">help</button>
+            <button class="cin-quick-btn" data-cmd="whoami">whoami</button>
+            <button class="cin-quick-btn" data-cmd="ls">ls</button>
+            <button class="cin-quick-btn" data-cmd="status">status</button>
+            <button class="cin-quick-btn" data-cmd="nmap">nmap</button>
+            <button class="cin-quick-btn" data-cmd="scan">scan</button>
+            <button class="cin-quick-btn" data-cmd="hack">hack</button>
+            <button class="cin-quick-btn" data-cmd="ctf">ctf</button>
+            <button class="cin-quick-btn" data-cmd="projects">projects</button>
+            <button class="cin-quick-btn" data-cmd="join">join</button>
+            <button class="cin-quick-btn" data-cmd="clear">clear</button>
           </div>
-
-          <!-- Status bar -->
           <div class="cin-term-statusbar">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span>
-                <span class="cin-status-dot"></span>
-                Connected
-              </span>
-              <span style="opacity:0.25">|</span>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span><span class="cin-status-dot"></span>Connected</span>
+              <span style="opacity:.25">|</span>
               <span id="cin-clock">--:--:--</span>
             </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="color:rgba(200,255,0,0.5)">guest</span>
-              <span style="opacity:0.25">|</span>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="color:rgba(200,255,0,.5)">guest</span>
+              <span style="opacity:.25">|</span>
               <span>SCS Terminal v4.0.0</span>
             </div>
           </div>
-
-        </div><!-- /.cin-terminal-window -->
-      </div><!-- /.cin-terminal-overlay -->
+        </div>
+      </div>
 
     </div><!-- /.cin-sticky -->
   </div><!-- /.cin-scroll-container -->
 
-
-  <!-- ══ SCRIPTS ═══════════════════════════════════════════════ -->
-  <!-- Cinematic engine (loads Three.js dynamically) -->
+  <!-- GSAP + Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="assets/js/cinematic.js"></script>
-
 </body>
 </html>

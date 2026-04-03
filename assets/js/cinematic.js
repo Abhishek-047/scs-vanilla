@@ -1,1110 +1,650 @@
 /**
- * SCS — CINEMATIC 3D SCROLL ENGINE v4.0
- * ─────────────────────────────────────────────────────────────
- * Features:
- *  • Three.js starfield / particle system background
- *  • 3D perspective-driven scene transitions
- *  • Smooth lerp scroll (fixed parallax overwrite bug)
- *  • CSS 3D tilt on holo-panels via mouse tracking
- *  • Matrix rain canvas
- *  • Full terminal engine with command history
- *  • Real-time clock, session ID, live stat counters
- *  • Magnetic cursor with hover states
- * ─────────────────────────────────────────────────────────────
+ * SCS — CINEMATIC ENGINE v5.0
+ * GSAP ScrollTrigger  +  Three.js Globe & Starfield
+ * ─────────────────────────────────────────────────
  */
-
 (function () {
   'use strict';
 
-  /* ════════════════════════════════════════════════════
-     CONSTANTS
-     ════════════════════════════════════════════════════ */
-  const SCROLL_LERP = 0.12;   // smooth scroll factor
-  const MOUSE_LERP  = 0.08;   // cursor lag factor
-  const SCENE_COUNT = 4;
-
-  /* ════════════════════════════════════════════════════
-     STATE
-     ════════════════════════════════════════════════════ */
+  /* ══════════════════════ STATE ══════════════════════ */
   const st = {
-    scrollY: 0,
-    targetScrollY: 0,
-    mouseX: 0, mouseY: 0,
-    targetMouseX: window.innerWidth  / 2,
-    targetMouseY: window.innerHeight / 2,
-    nX: 0, nY: 0,          // normalised mouse [-1,1]
+    nX: 0, nY: 0,
     targetNX: 0, targetNY: 0,
-    scene: 0,
     matrixActive: false,
-    terminalReady: false,
     terminalBooted: false,
-    cmdHistory: [],
-    cmdHistoryIdx: -1,
-    currentCmd: '',
-    raf: null,
+    cmdHistory: [], cmdHistoryIdx: -1, currentCmd: '',
+    globeT: 0,
   };
 
-  /* ════════════════════════════════════════════════════
-     ELEMENT CACHE
-     ════════════════════════════════════════════════════ */
   let els = {};
 
+  /* ══════════════════ ELEMENT CACHE ══════════════════ */
   function resolveEls() {
     els = {
-      bgCanvas:      document.getElementById('cin-bg-canvas'),
-      splineRoom:    document.getElementById('cin-room'),
-      splineGlobe:   document.getElementById('cin-globe'),
-      scene1:        document.getElementById('cin-s1'),
-      scene2ui:      document.getElementById('cin-s2'),
-      holoPanel:     document.getElementById('cin-s3'),
-      termOverlay:   document.getElementById('cin-term'),
-      enteringText:  document.getElementById('cin-entering'),
-      matrixCanvas:  document.getElementById('cin-matrix'),
-      termBody:      document.getElementById('cin-term-body'),
-      termInput:     document.getElementById('cin-term-input'),
-      termOutput:    document.getElementById('cin-term-output'),
-      cursorDot:     document.getElementById('cin-cursor-dot'),
-      cursorRing:    document.getElementById('cin-cursor-ring'),
-      progressDots:  document.querySelectorAll('.cin-progress-dot'),
-      miniCards:     document.querySelectorAll('.cin-mini-card'),
-      holoPanels:    document.querySelectorAll('.cin-holo-panel'),
-      gridCanvas:    document.getElementById('cin-grid-canvas'),
+      bgCanvas:     document.getElementById('cin-bg-canvas'),
+      bgRoom:       document.getElementById('cin-room'),
+      gridCanvas:   document.getElementById('cin-grid-canvas'),
+      globe:        document.getElementById('cin-globe'),
+      globeCanvas:  document.getElementById('cin-globe-canvas'),
+      scene1:       document.getElementById('cin-s1'),
+      s1Cards:      document.getElementById('cin-s1-cards'),
+      miniCards:    document.querySelectorAll('.cin-mini-card'),
+      scene2ui:     document.getElementById('cin-s2'),
+      holoWrap:     document.getElementById('cin-s3'),
+      holoPanels:   document.querySelectorAll('.cin-holo-panel'),
+      entering:     document.getElementById('cin-entering'),
+      termOverlay:  document.getElementById('cin-term'),
+      matrixCanvas: document.getElementById('cin-matrix'),
+      termBody:     document.getElementById('cin-term-body'),
+      termInput:    document.getElementById('cin-term-input'),
+      termOutput:   document.getElementById('cin-term-output'),
+      cursorDot:    document.getElementById('cin-cursor-dot'),
+      cursorRing:   document.getElementById('cin-cursor-ring'),
+      progressDots: document.querySelectorAll('.cin-progress-dot'),
+      thrThreat:    document.getElementById('cin-stat-threats'),
+      thrNodes:     document.getElementById('cin-stat-nodes'),
+      thrCtf:       document.getElementById('cin-stat-ctf'),
+      clock:        document.getElementById('cin-clock'),
+      sessionId:    document.getElementById('cin-session-id'),
     };
   }
 
-  /* ════════════════════════════════════════════════════
-     MATH HELPERS
-     ════════════════════════════════════════════════════ */
-  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-  const lerp  = (a, b, t) => a + (b - a) * t;
-  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  /* ══════════════════════ GSAP ════════════════════════ */
+  function initGSAP() {
+    if (typeof gsap === 'undefined') return;
+    gsap.registerPlugin(ScrollTrigger);
 
-  function sceneProgress(p, start, end) {
-    return clamp((p - start) / (end - start), 0, 1);
-  }
+    // ── Initial hidden states ──
+    gsap.set([els.scene2ui, els.holoWrap, els.entering, els.termOverlay], { opacity: 0 });
+    gsap.set(els.holoPanels, { opacity: 0, y: 70, rotationX: 22, transformPerspective: 900, force3D: true });
+    gsap.set(els.globe, { opacity: 0, scale: 0.4, yPercent: -50 });
 
-  /* ════════════════════════════════════════════════════
-     SCROLL
-     ════════════════════════════════════════════════════ */
-  function initScroll() {
-    const onScroll = () => { st.targetScrollY = window.scrollY; };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    st.scrollY = st.targetScrollY = window.scrollY;
-  }
+    // ── Master scroll timeline ──
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.cin-scroll-container',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1.4,
+        onUpdate(self) {
+          const p = self.progress;
+          // Progress dots
+          let a = 0;
+          if (p >= 0.75) a = 3;
+          else if (p >= 0.5) a = 2;
+          else if (p >= 0.25) a = 1;
+          els.progressDots.forEach((d, i) => d.classList.toggle('active', i === a));
 
-  function calcProgress() {
-    const max = window.innerHeight * 4;
-    return clamp(st.scrollY / max, 0, 1);
-  }
+          // Grid opacity
+          const gridOp = smoothstep(0.2, 0.45, p) * (1 - smoothstep(0.45, 0.65, p));
+          if (els.gridCanvas) els.gridCanvas.style.opacity = gridOp;
 
-  /* ════════════════════════════════════════════════════
-     MOUSE + CURSOR
-     ════════════════════════════════════════════════════ */
-  function initMouse() {
-    document.addEventListener('mousemove', (e) => {
-      st.targetMouseX = e.clientX;
-      st.targetMouseY = e.clientY;
-      st.targetNX = (e.clientX / window.innerWidth  - 0.5) * 2;
-      st.targetNY = (e.clientY / window.innerHeight - 0.5) * 2;
-    }, { passive: true });
-
-    // Cursor hover state
-    document.addEventListener('mouseover', (e) => {
-      if (e.target.closest('a, button, .cin-progress-dot, .cin-term-dot, input')) {
-        if (els.cursorRing) els.cursorRing.classList.add('hovering');
-      }
-    });
-    document.addEventListener('mouseout', (e) => {
-      if (e.target.closest('a, button, .cin-progress-dot, .cin-term-dot, input')) {
-        if (els.cursorRing) els.cursorRing.classList.remove('hovering');
-      }
-    });
-    document.addEventListener('mousedown', () => {
-      if (els.cursorRing) els.cursorRing.classList.add('clicking');
-    });
-    document.addEventListener('mouseup', () => {
-      if (els.cursorRing) els.cursorRing.classList.remove('clicking');
-    });
-  }
-
-  function updateCursor() {
-    st.mouseX = lerp(st.mouseX, st.targetMouseX, MOUSE_LERP + 0.05);
-    st.mouseY = lerp(st.mouseY, st.targetMouseY, MOUSE_LERP + 0.05);
-    st.nX     = lerp(st.nX,     st.targetNX,     MOUSE_LERP);
-    st.nY     = lerp(st.nY,     st.targetNY,     MOUSE_LERP);
-
-    if (els.cursorDot) {
-      els.cursorDot.style.left = st.mouseX + 'px';
-      els.cursorDot.style.top  = st.mouseY + 'px';
-    }
-    if (els.cursorRing) {
-      els.cursorRing.style.left = st.mouseX + 'px';
-      els.cursorRing.style.top  = st.mouseY + 'px';
-    }
-  }
-
-  /* ════════════════════════════════════════════════════
-     THREE.JS STARFIELD / PARTICLE BACKGROUND
-     ════════════════════════════════════════════════════ */
-  function initThreeBackground() {
-    // Load Three.js from CDN, then build scene
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
-    script.onload = buildThreeScene;
-    script.onerror = () => console.warn('Three.js not loaded, skipping starfield');
-    document.head.appendChild(script);
-  }
-
-  function buildThreeScene() {
-    if (typeof THREE === 'undefined') return;
-
-    const canvas = els.bgCanvas;
-    if (!canvas) return;
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0);
-
-    const scene  = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
-    camera.position.z = 600;
-
-    /* ─── STAR PARTICLES ─── */
-    const starCount = 1800;
-    const starGeo   = new THREE.BufferGeometry();
-    const positions = new Float32Array(starCount * 3);
-    const colors    = new Float32Array(starCount * 3);
-    const sizes     = new Float32Array(starCount);
-
-    const palette = [
-      [0.78, 1.0,  0.0],   // acid green
-      [0.0,  0.96, 1.0],   // cyan
-      [1.0,  1.0,  1.0],   // white
-      [0.6,  0.6,  1.0],   // blue-violet
-    ];
-
-    for (let i = 0; i < starCount; i++) {
-      positions[i * 3]     = (Math.random() - 0.5) * 2000;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 1200;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 1200 - 200;
-
-      const col = palette[Math.floor(Math.random() * palette.length)];
-      colors[i * 3]     = col[0];
-      colors[i * 3 + 1] = col[1];
-      colors[i * 3 + 2] = col[2];
-      sizes[i] = Math.random() * 2.2 + 0.4;
-    }
-
-    starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    starGeo.setAttribute('color',    new THREE.BufferAttribute(colors,    3));
-    starGeo.setAttribute('size',     new THREE.BufferAttribute(sizes,     1));
-
-    const starMat = new THREE.PointsMaterial({
-      vertexColors: true,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    // Try to set size from attribute
-    starMat.size = 1.5;
-
-    const stars = new THREE.Points(starGeo, starMat);
-    scene.add(stars);
-
-    /* ─── CONNECTION LINES ─── */
-    const lineCount  = 60;
-    const lineGeo    = new THREE.BufferGeometry();
-    const linePos    = new Float32Array(lineCount * 6);
-    const lineColors = new Float32Array(lineCount * 6);
-
-    for (let i = 0; i < lineCount; i++) {
-      const x1 = (Math.random() - 0.5) * 1600;
-      const y1 = (Math.random() - 0.5) * 900;
-      const z1 = (Math.random() - 0.5) * 400 - 100;
-      const x2 = x1 + (Math.random() - 0.5) * 300;
-      const y2 = y1 + (Math.random() - 0.5) * 200;
-
-      linePos[i * 6]     = x1; linePos[i * 6 + 1] = y1; linePos[i * 6 + 2] = z1;
-      linePos[i * 6 + 3] = x2; linePos[i * 6 + 4] = y2; linePos[i * 6 + 5] = z1;
-
-      // Acid green or cyan
-      const useAcid = Math.random() > 0.5;
-      const r = useAcid ? 0.78 : 0.0;
-      const g = useAcid ? 1.0  : 0.96;
-      const b = useAcid ? 0.0  : 1.0;
-      lineColors[i * 6] = r; lineColors[i * 6 + 1] = g; lineColors[i * 6 + 2] = b;
-      lineColors[i * 6 + 3] = r; lineColors[i * 6 + 4] = g; lineColors[i * 6 + 5] = b;
-    }
-
-    lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
-    lineGeo.setAttribute('color',    new THREE.BufferAttribute(lineColors, 3));
-
-    const lineMat = new THREE.LineBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.12,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    const lines = new THREE.LineSegments(lineGeo, lineMat);
-    scene.add(lines);
-
-    /* ─── RESIZE ─── */
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    /* ─── ANIMATE ─── */
-    let frame = 0;
-    function animateThree() {
-      requestAnimationFrame(animateThree);
-      frame++;
-
-      // Slow rotation
-      stars.rotation.y += 0.00015;
-      stars.rotation.x  = st.nY * 0.06;
-      lines.rotation.y  = stars.rotation.y;
-      lines.rotation.x  = st.nY * 0.04;
-
-      // Camera drift with mouse
-      camera.position.x = lerp(camera.position.x, st.nX * 40, 0.02);
-      camera.position.y = lerp(camera.position.y, st.nY * -25, 0.02);
-
-      // Pulse opacity based on scroll
-      const p = calcProgress();
-      starMat.opacity = p > 0.75 ? 0.08 : 0.4 + (1 - p) * 0.35;
-      lineMat.opacity = p > 0.75 ? 0.02 : 0.08 + (1 - p) * 0.1;
-
-      renderer.render(scene, camera);
-    }
-    animateThree();
-  }
-
-  /* ════════════════════════════════════════════════════
-     3D PERSPECTIVE GRID (Scene 2 floor)
-     ════════════════════════════════════════════════════ */
-  function initGrid() {
-    const gridEl = document.querySelector('.cin-3d-grid');
-    if (!gridEl) return;
-
-    const canvas = document.createElement('canvas');
-    canvas.id = 'cin-grid-canvas';
-    gridEl.appendChild(canvas);
-    els.gridCanvas = canvas;
-
-    const ctx = canvas.getContext('2d');
-    let w, h;
-
-    function resize() {
-      w = canvas.width  = gridEl.offsetWidth;
-      h = canvas.height = gridEl.offsetHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    function drawGrid(opacity) {
-      ctx.clearRect(0, 0, w, h);
-      const vp = { x: w / 2, y: h * 0.05 }; // vanishing point
-      const rows = 16;
-      const cols = 24;
-
-      ctx.save();
-      ctx.globalAlpha = opacity;
-
-      // Horizontal lines
-      for (let r = 0; r <= rows; r++) {
-        const t = r / rows;
-        const y = vp.y + (h - vp.y) * (t * t);    // perspective squeeze
-        const xl = w * (0.5 - t * 0.5);
-        const xr = w * (0.5 + t * 0.5);
-
-        const alpha = t * 0.8;
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(0,245,255,${alpha * 0.25})`;
-        ctx.lineWidth = t < 0.3 ? 0.5 : 1;
-        ctx.moveTo(xl, y);
-        ctx.lineTo(xr, y);
-        ctx.stroke();
-      }
-
-      // Vertical lines
-      for (let c = 0; c <= cols; c++) {
-        const t = c / cols;
-        const startX = w * t;
-        // Find where this line starts at horizon
-        const startY = vp.y;
-        const endX   = lerp(vp.x, startX, 1);
-        const endY   = h;
-
-        const dist = Math.abs(t - 0.5);
-        const alpha = 0.2 - dist * 0.15;
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(0,245,255,${Math.max(0, alpha)})`;
-        ctx.lineWidth = 0.5;
-        ctx.moveTo(vp.x + (startX - vp.x) * 0, startY);
-        ctx.lineTo(startX, endY);
-        ctx.stroke();
-      }
-
-      // Horizon glow
-      const horizGrad = ctx.createLinearGradient(0, vp.y - 2, 0, vp.y + 8);
-      horizGrad.addColorStop(0, 'rgba(0,245,255,0)');
-      horizGrad.addColorStop(0.5, `rgba(0,245,255,${opacity * 0.4})`);
-      horizGrad.addColorStop(1, 'rgba(0,245,255,0)');
-      ctx.fillStyle = horizGrad;
-      ctx.fillRect(0, vp.y - 2, w, 10);
-
-      ctx.restore();
-    }
-
-    // Expose draw function
-    els.drawGrid = drawGrid;
-  }
-
-  /* ════════════════════════════════════════════════════
-     SCENE ENGINE (main render loop)
-     ════════════════════════════════════════════════════ */
-  function renderFrame() {
-    st.scrollY = lerp(st.scrollY, st.targetScrollY, SCROLL_LERP);
-    updateCursor();
-    applyScenes();
-    st.raf = requestAnimationFrame(renderFrame);
-  }
-
-  function applyScenes() {
-    const p  = calcProgress();
-    const s1 = sceneProgress(p, 0,    0.25);
-    const s2 = sceneProgress(p, 0.25, 0.50);
-    const s3 = sceneProgress(p, 0.50, 0.75);
-    const s4 = sceneProgress(p, 0.75, 1.00);
-
-    /* ── Progress indicator ── */
-    let activeScene = 0;
-    if (p >= 0.75) activeScene = 3;
-    else if (p >= 0.50) activeScene = 2;
-    else if (p >= 0.25) activeScene = 1;
-
-    if (activeScene !== st.scene) {
-      st.scene = activeScene;
-      updateProgressDots(activeScene);
-    }
-
-    /* ── SPLINE ROOM: 3D zoom-in effect ── */
-    if (els.splineRoom) {
-      const zoom     = 1 + s2 * 0.14 + s3 * 0.06;
-      const roomOp   = clamp(1 - s4 * 2.8, 0, 1);
-      const tiltX    = s2 * 3;    // subtle perspective tilt inward
-      els.splineRoom.style.transform = `scale(${zoom}) perspective(900px) rotateX(${tiltX}deg)`;
-      els.splineRoom.style.opacity   = roomOp;
-    }
-
-    /* ── SCENE 1: fade + slide out during s2 ── */
-    if (els.scene1) {
-      const fadeOut  = clamp(1 - s2 * 2.5, 0, 1);
-      const slideX   = easeOut(s2) * -80;
-      const tiltY    = s2 * -6;    // 3D rotate out
-      els.scene1.style.opacity   = fadeOut;
-      els.scene1.style.transform = `translateX(${slideX}px) perspective(600px) rotateY(${tiltY}deg)`;
-
-      // Parallax when scene 1 visible
-      if (p < 0.28) {
-        const px = st.nX * -12;
-        const py = st.nY * -7;
-        // Merge with existing transform
-        els.scene1.style.transform =
-          `translate(${px}px,${py}px) perspective(600px) rotateY(${tiltY}deg)`;
-      }
-    }
-
-    /* ── HERO MINI CARDS (follow scene1 opacity) ── */
-    if (els.miniCards.length) {
-      const cardOp = clamp(1 - s2 * 3, 0, 1);
-      els.miniCards.forEach(c => {
-        c.style.opacity = cardOp;
-      });
-    }
-
-    /* ── GLOBE: scale in during s2, subtle tilt ── */
-    if (els.splineGlobe) {
-      const gOp    = clamp(s2 * 3, 0, 1);
-      const gScale = 0.4 + s2 * 0.65;
-      const gFade  = clamp(1 - (s4 - 0.3) * 3.5, 0, 1);
-      const panX   = st.nX * 18;
-      const panY   = st.nY * 10;
-
-      els.splineGlobe.style.opacity   = gOp * gFade;
-      els.splineGlobe.style.transform =
-        `translateY(calc(-50% + ${panY}px)) translateX(${panX}px) scale(${gScale})`;
-    }
-
-    /* ── SCENE 2 UI stats ── */
-    if (els.scene2ui) {
-      const sIn  = clamp(s2 * 3.5, 0, 1);
-      const sOut = clamp(1 - s3 * 3.5, 0, 1);
-      const slide = (1 - Math.min(s2 * 3.5, 1)) * 35;
-      els.scene2ui.style.opacity   = easeOut(sIn) * sOut;
-      els.scene2ui.style.transform = `translateY(${slide}px)`;
-    }
-
-    /* ── 3D GRID FLOOR ── */
-    if (els.drawGrid) {
-      const gridOp  = clamp(s2 * 2.5, 0, 1) * clamp(1 - s3 * 2.5, 0, 1);
-      const gridEl  = document.querySelector('.cin-3d-grid');
-      if (gridEl) gridEl.style.opacity = gridOp;
-      if (gridOp > 0.01) els.drawGrid(gridOp);
-    }
-
-    /* ── HOLO PANELS (3D entry) ── */
-    if (els.holoPanel) {
-      const pIn  = clamp(s3 * 3.5, 0, 1);
-      const pOut = clamp(1 - s4 * 5, 0, 1);
-      const masterOp = easeOut(pIn) * pOut;
-      els.holoPanel.style.opacity       = masterOp;
-      els.holoPanel.style.pointerEvents = masterOp > 0.05 ? 'auto' : 'none';
-
-      // Each panel enters with 3D flip
-      els.holoPanels.forEach((panel, i) => {
-        const pDelay = i * 0.1;
-        const pAmt   = clamp((s3 - pDelay) * 5, 0, 1);
-        const slideY = (1 - easeOut(pAmt)) * 55;
-        const rotX   = (1 - easeOut(pAmt)) * 20;
-        const rotY   = [-6, 0, 6][i] || 0;  // subtle fan spread
-
-        panel.style.opacity   = easeOut(pAmt) * pOut;
-        panel.style.transform =
-          `perspective(800px) rotateY(${rotY}deg) rotateX(${rotX}deg) translateY(${slideY}px)`;
-
-        // Mark visible for hover float animation
-        if (pAmt > 0.9 && pOut > 0.5) {
-          panel.classList.add('panel-visible');
-          panel.style.setProperty('--panel-rot-y', `${rotY}deg`);
-          panel.style.setProperty('--panel-rot-x', `2deg`);
-        } else {
-          panel.classList.remove('panel-visible');
+          // Terminal activation
+          if (p > 0.8 && !st.matrixActive)      activateTerminal();
+          if (p <= 0.8 && st.matrixActive)       deactivateTerminal();
         }
-      });
-    }
-
-    /* ── ENTERING TEXT ── */
-    if (els.enteringText) {
-      const eIn  = clamp(s4 * 7, 0, 1);
-      const eOut = clamp((s4 - 0.25) * 6, 0, 1);
-      els.enteringText.style.opacity = eIn * (1 - eOut);
-    }
-
-    /* ── TERMINAL OVERLAY ── */
-    if (els.termOverlay) {
-      const termOp = clamp((s4 - 0.18) * 6, 0, 1);
-      els.termOverlay.style.opacity       = termOp;
-      els.termOverlay.style.pointerEvents = termOp > 0.45 ? 'auto' : 'none';
-
-      if (termOp > 0.45) {
-        els.termOverlay.classList.add('active');
-        if (!st.matrixActive) {
-          st.matrixActive = true;
-          els.matrixCanvas && els.matrixCanvas.classList.add('active');
-        }
-        if (!st.terminalReady && els.termInput) {
-          st.terminalReady = true;
-          setTimeout(() => els.termInput.focus(), 350);
-          if (!st.terminalBooted) {
-            st.terminalBooted = true;
-            bootTerminal();
-          }
-        }
-      } else {
-        els.termOverlay.classList.remove('active');
-        if (st.matrixActive) {
-          st.matrixActive = false;
-          els.matrixCanvas && els.matrixCanvas.classList.remove('active');
-        }
-        st.terminalReady = false;
       }
-    }
-  }
+    });
 
-  /* ════════════════════════════════════════════════════
-     PROGRESS DOTS
-     ════════════════════════════════════════════════════ */
-  function updateProgressDots(active) {
+    // ── S1 → S2: hero exits, globe enters ──
+    tl.to(els.scene1,  { opacity: 0, x: -90, rotationY: -7, transformPerspective: 700, duration: 0.5, ease: 'power2.in' }, 0.55)
+      .to(els.s1Cards,  { opacity: 0, x: 60, duration: 0.4 }, 0.55)
+      .to(els.miniCards, { opacity: 0, y: 12, stagger: 0.04, duration: 0.35 }, 0.6)
+      .to(els.bgRoom,   { scale: 1.14, filter: 'brightness(0.35) contrast(1.1) saturate(0.6)', transformOrigin: 'center center', duration: 2, ease: 'none' }, 0)
+      .to(els.globe,    { opacity: 1, scale: 1, yPercent: -50, duration: 0.7, ease: 'expo.out' }, 0.8)
+      .to(els.scene2ui, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 1.0)
+
+    // ── S2 → S3: globe exits, panels enter ──
+      .to(els.globe,    { opacity: 0, scale: 0.72, duration: 0.45, ease: 'power2.in' }, 1.8)
+      .to(els.scene2ui, { opacity: 0, y: -20, duration: 0.4 }, 1.8)
+      .to(els.bgRoom,   { opacity: 0.35, duration: 0.45 }, 1.9)
+      .to(els.holoWrap, { opacity: 1, duration: 0.01 }, 1.95)
+      .to(els.holoPanels, { opacity: 1, y: 0, rotationX: 0, stagger: 0.18, duration: 0.65, ease: 'power3.out' }, 2.0)
+
+    // ── S3 → S4: panels exit, terminal enters ──
+      .to(els.holoPanels, { opacity: 0, y: -30, stagger: 0.08, duration: 0.35 }, 2.9)
+      .to(els.holoWrap,   { opacity: 0, duration: 0.01 }, 3.05)
+      .to(els.entering,   { opacity: 1, duration: 0.18 }, 3.1)
+      .to(els.entering,   { opacity: 0, duration: 0.18 }, 3.3)
+      .to(els.bgRoom,     { opacity: 0, duration: 0.5 }, 3.2)
+      .to(els.termOverlay, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 3.3);
+
+    // ── Progress dot clicks ──
+    const snaps = [0, 0.25, 0.5, 0.75];
     els.progressDots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === active);
-    });
-  }
-
-  function initProgressDots() {
-    const targets = [0, 0.27, 0.52, 0.77];
-    els.progressDots.forEach((dot, i) => {
-      dot.style.cursor = 'pointer';
       dot.addEventListener('click', () => {
         const max = window.innerHeight * 4;
-        window.scrollTo({ top: targets[i] * max, behavior: 'smooth' });
+        window.scrollTo({ top: snaps[i] * max, behavior: 'smooth' });
       });
+    });
+
+    // ── Panel 3D hover via GSAP ──
+    setTimeout(initPanelHover, 300);
+  }
+
+  function smoothstep(lo, hi, t) {
+    const x = Math.max(0, Math.min(1, (t - lo) / (hi - lo)));
+    return x * x * (3 - 2 * x);
+  }
+
+  /* ════════════════ TERMINAL ACTIVATION ══════════════ */
+  function activateTerminal() {
+    st.matrixActive = true;
+    els.termOverlay.classList.add('active');
+    els.termOverlay.style.pointerEvents = 'auto';
+    els.matrixCanvas && els.matrixCanvas.classList.add('active');
+    if (!st.terminalBooted) {
+      st.terminalBooted = true;
+      setTimeout(() => {
+        els.termInput && els.termInput.focus();
+        bootTerminal();
+      }, 350);
+    }
+  }
+  function deactivateTerminal() {
+    st.matrixActive = false;
+    els.termOverlay.classList.remove('active');
+    els.termOverlay.style.pointerEvents = 'none';
+    els.matrixCanvas && els.matrixCanvas.classList.remove('active');
+  }
+
+  /* ══════════════════════ MOUSE ═══════════════════════ */
+  function initMouse() {
+    document.addEventListener('mousemove', e => {
+      st.targetNX = (e.clientX / window.innerWidth  - 0.5) * 2;
+      st.targetNY = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (typeof gsap === 'undefined') return;
+      gsap.to(els.cursorDot,  { x: e.clientX, y: e.clientY, duration: 0.08, ease: 'power1.out' });
+      gsap.to(els.cursorRing, { x: e.clientX, y: e.clientY, duration: 0.22, ease: 'power2.out' });
+      // Globe mouse pan (only while visible)
+      if (els.globe) {
+        gsap.to(els.globe, { x: st.targetNX * 20, duration: 1.1, ease: 'power2.out', overwrite: 'auto' });
+      }
+    }, { passive: true });
+    document.addEventListener('mousedown', () => els.cursorRing?.classList.add('clicking'));
+    document.addEventListener('mouseup', () => els.cursorRing?.classList.remove('clicking'));
+    document.addEventListener('mouseover', e => {
+      if (e.target.closest('a,button,.cin-progress-dot,.cin-term-dot,input'))
+        els.cursorRing?.classList.add('hovering');
+    });
+    document.addEventListener('mouseout', e => {
+      if (e.target.closest('a,button,.cin-progress-dot,.cin-term-dot,input'))
+        els.cursorRing?.classList.remove('hovering');
     });
   }
 
-  /* ════════════════════════════════════════════════════
-     HOLO PANEL 3D TILT (mouse-based per-panel)
-     ════════════════════════════════════════════════════ */
+  /* ════════════════ PANEL 3D HOVER ═══════════════════ */
   function initPanelHover() {
+    if (typeof gsap === 'undefined') return;
+    const bases = [-7, 0, 7];
     els.holoPanels.forEach((panel, i) => {
-      const baseRotY = [-6, 0, 6][i] || 0;
-      panel.addEventListener('mousemove', (e) => {
-        const rect = panel.getBoundingClientRect();
-        const x    = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
-        const y    = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
-        const rotX = y * -8;
-        const rotY = x *  8 + baseRotY;
-
-        panel.style.transform =
-          `perspective(800px) rotateY(${rotY}deg) rotateX(${rotX}deg) translateY(0px)`;
-        panel.style.boxShadow = `
-          ${x * 15}px ${y * 10}px 50px rgba(0,245,255,0.12),
-          0 0 0 1px rgba(0,245,255,0.2),
-          0 30px 80px rgba(0,0,0,0.7),
-          inset 0 1px 0 rgba(255,255,255,0.08)
-        `;
+      const ry = bases[i] || 0;
+      panel.addEventListener('mousemove', e => {
+        const r = panel.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width  - 0.5) * 2;
+        const y = ((e.clientY - r.top)  / r.height - 0.5) * 2;
+        gsap.to(panel, { rotationX: y * -9, rotationY: x * 9 + ry, duration: 0.4, ease: 'power2.out', transformPerspective: 900, overwrite: 'auto' });
+        gsap.to(panel, { boxShadow: `${x*16}px ${y*10}px 55px rgba(0,245,255,.14), 0 0 0 1px rgba(0,245,255,.24), 0 30px 80px rgba(0,0,0,.75)`, duration: 0.4 });
       });
       panel.addEventListener('mouseleave', () => {
-        panel.style.transform = `perspective(800px) rotateY(${baseRotY}deg) rotateX(2deg) translateY(0)`;
-        panel.style.boxShadow = '';
+        gsap.to(panel, { rotationX: 0, rotationY: ry, duration: 0.7, ease: 'elastic.out(1,0.6)', transformPerspective: 900, overwrite: 'auto' });
+        gsap.to(panel, { boxShadow: '', duration: 0.5 });
       });
     });
   }
 
-  /* ════════════════════════════════════════════════════
-     MATRIX RAIN
-     ════════════════════════════════════════════════════ */
-  function initMatrix() {
-    const canvas = els.matrixCanvas;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+  /* ════════════ THREE.JS STARFIELD BACKGROUND ═════════ */
+  function buildStarfield() {
+    const canvas = els.bgCanvas;
+    if (!canvas || typeof THREE === 'undefined') return;
+    const R = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
+    R.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    R.setSize(window.innerWidth, window.innerHeight);
+    R.setClearColor(0x000000, 0);
+    const scene = new THREE.Scene();
+    const cam   = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+    cam.position.z = 600;
 
-    function resize() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
+    const N = 1600, pos = new Float32Array(N*3), col = new Float32Array(N*3);
+    const pal = [[0.78,1,0],[0,0.96,1],[1,1,1],[0.6,0.6,1]];
+    for (let i=0; i<N; i++) {
+      pos[i*3]   = (Math.random()-.5)*1800;
+      pos[i*3+1] = (Math.random()-.5)*1000;
+      pos[i*3+2] = (Math.random()-.5)*1000-100;
+      const c = pal[Math.floor(Math.random()*pal.length)];
+      col[i*3]=c[0]; col[i*3+1]=c[1]; col[i*3+2]=c[2];
     }
-    resize();
-    window.addEventListener('resize', resize, { passive: true });
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    geo.setAttribute('color',    new THREE.BufferAttribute(col,3));
+    const mat = new THREE.PointsMaterial({ vertexColors:true, size:1.6, sizeAttenuation:true, transparent:true, opacity:0.65, blending:THREE.AdditiveBlending, depthWrite:false });
+    const stars = new THREE.Points(geo, mat);
+    scene.add(stars);
 
-    const charsKana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ';
-    const charsHex  = '0123456789ABCDEF';
-    const chars     = '01' + charsHex + charsKana + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const fontSize  = 13;
-    let cols  = Math.floor(canvas.width / fontSize);
-    let drops = Array.from({ length: cols }, () => Math.random() * -100);
-
-    function drawMatrix() {
-      // Semi-transparent fade
-      ctx.fillStyle = 'rgba(5,5,8,0.06)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      for (let i = 0; i < drops.length; i++) {
-        const char = chars[Math.floor(Math.random() * chars.length)];
-        const x    = i * fontSize;
-        const y    = drops[i] * fontSize;
-
-        // Brighter head char
-        const isHead = drops[i] % 1 < 0.05;
-        const alpha  = isHead ? 1.0 : 0.15 + Math.random() * 0.55;
-        ctx.fillStyle = isHead
-          ? `rgba(255,255,255,${alpha})`
-          : `rgba(200,255,0,${alpha})`;
-        ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
-        ctx.fillText(char, x, y);
-
-        if (y > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i] += 0.55;
-      }
+    // Connection lines
+    const lN=55, lPos=new Float32Array(lN*6), lCol=new Float32Array(lN*6);
+    for (let i=0;i<lN;i++){
+      const x1=(Math.random()-.5)*1500, y1=(Math.random()-.5)*900, z1=(Math.random()-.5)*400-100;
+      lPos[i*6]=x1;lPos[i*6+1]=y1;lPos[i*6+2]=z1;
+      lPos[i*6+3]=x1+(Math.random()-.5)*280;lPos[i*6+4]=y1+(Math.random()-.5)*180;lPos[i*6+5]=z1;
+      const acid=Math.random()>.5;
+      const r=acid?.78:0, g=acid?1:.96, b=acid?0:1;
+      lCol[i*6]=r;lCol[i*6+1]=g;lCol[i*6+2]=b;lCol[i*6+3]=r;lCol[i*6+4]=g;lCol[i*6+5]=b;
     }
+    const lGeo=new THREE.BufferGeometry();
+    lGeo.setAttribute('position',new THREE.BufferAttribute(lPos,3));
+    lGeo.setAttribute('color',   new THREE.BufferAttribute(lCol,3));
+    const lMat=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.1,blending:THREE.AdditiveBlending,depthWrite:false});
+    const lines=new THREE.LineSegments(lGeo,lMat);
+    scene.add(lines);
 
-    setInterval(drawMatrix, 48);
+    window.addEventListener('resize',()=>{ cam.aspect=window.innerWidth/window.innerHeight; cam.updateProjectionMatrix(); R.setSize(window.innerWidth,window.innerHeight); });
+
+    let t=0;
+    (function loop(){
+      requestAnimationFrame(loop); t+=0.00012;
+      stars.rotation.y = t;
+      stars.rotation.x = st.nY * 0.05;
+      lines.rotation.y = t;
+      cam.position.x = st.nX * 35;
+      cam.position.y = st.nY * -20;
+      // fade near terminal
+      const p = window.scrollY / (window.innerHeight*4);
+      mat.opacity  = p>.75 ? 0.08 : 0.4 + (1-p)*.28;
+      lMat.opacity = p>.75 ? 0.02 : 0.08 + (1-p)*.08;
+      R.render(scene,cam);
+    })();
   }
 
-  /* ════════════════════════════════════════════════════
-     TERMINAL ENGINE
-     ════════════════════════════════════════════════════ */
-  const COMMANDS = {
-    help,    whoami,  ls,      status,
-    nmap,    hack,    ctf,     join,
-    clear,   exit,   man,     echo,
-    ping,    scan,   decrypt, projects,
-  };
+  /* ═══════════════ THREE.JS GLOBE ════════════════════ */
+  function buildGlobe() {
+    const canvas = els.globeCanvas;
+    if (!canvas || typeof THREE === 'undefined') return;
+
+    const W = canvas.parentElement.offsetWidth  || 400;
+    const H = canvas.parentElement.offsetHeight || 400;
+
+    const R   = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    R.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    R.setSize(W,H);
+    R.setClearColor(0x000000,0);
+
+    const scene  = new THREE.Scene();
+    const cam    = new THREE.PerspectiveCamera(44, W/H, 0.1, 100);
+    cam.position.z = 2.8;
+
+    const grp = new THREE.Group();
+    scene.add(grp);
+
+    // ── Core sphere (dark)
+    grp.add(new THREE.Mesh(
+      new THREE.SphereGeometry(1,40,40),
+      new THREE.MeshBasicMaterial({ color:0x010812, transparent:true, opacity:0.92 })
+    ));
+
+    // ── Wireframe overlay
+    grp.add(new THREE.Mesh(
+      new THREE.SphereGeometry(1.001,24,24),
+      new THREE.MeshBasicMaterial({ color:0x00f5ff, wireframe:true, transparent:true, opacity:0.1 })
+    ));
+
+    // ── Lat / Lon grid lines
+    function latLine(latDeg, opacity) {
+      const r = Math.cos(latDeg*Math.PI/180);
+      const y = Math.sin(latDeg*Math.PI/180);
+      const pts=[];
+      for(let i=0;i<=80;i++) {
+        const a=i/80*Math.PI*2;
+        pts.push(new THREE.Vector3(r*Math.cos(a),y,r*Math.sin(a)));
+      }
+      const g=new THREE.BufferGeometry().setFromPoints(pts);
+      return new THREE.Line(g, new THREE.LineBasicMaterial({color:0x00f5ff,transparent:true,opacity}));
+    }
+    function lonLine(lonDeg, opacity){
+      const r=(lonDeg*Math.PI/180);
+      const pts=[];
+      for(let i=0;i<=80;i++){
+        const a=(i/80)*Math.PI*2;
+        pts.push(new THREE.Vector3(Math.cos(a)*Math.cos(r),Math.sin(a),Math.cos(a)*Math.sin(r)));
+      }
+      const g=new THREE.BufferGeometry().setFromPoints(pts);
+      return new THREE.Line(g,new THREE.LineBasicMaterial({color:0x00f5ff,transparent:true,opacity}));
+    }
+    for(let lat=-75;lat<=75;lat+=30) grp.add(latLine(lat, lat%30===0?0.22:0.08));
+    for(let lon=0;lon<360;lon+=30) grp.add(lonLine(lon, 0.1));
+
+    // ── Glowing node dots (major cities)
+    const cities = [
+      [37.77,-122.42],[40.71,-74.01],[51.51,-0.13],[35.68,139.69],
+      [22.32,114.17],[1.35,103.82],[48.86,2.35],[-33.87,151.21],
+      [55.75,37.62],[19.08,72.88],
+    ];
+    const nodeMat  = new THREE.MeshBasicMaterial({ color:0xc8ff00 });
+    const ringMat  = new THREE.MeshBasicMaterial({ color:0xc8ff00, transparent:true, opacity:0.4, side:THREE.DoubleSide });
+    cities.forEach(([lat,lon])=>{
+      const φ=lat*Math.PI/180, λ=lon*Math.PI/180;
+      const x=Math.cos(φ)*Math.cos(λ), y=Math.sin(φ), z=Math.cos(φ)*Math.sin(λ);
+      const dot=new THREE.Mesh(new THREE.SphereGeometry(0.022,8,8),nodeMat);
+      dot.position.set(x,y,z); grp.add(dot);
+      const ring=new THREE.Mesh(new THREE.RingGeometry(0.028,0.045,16),ringMat.clone());
+      ring.position.set(x*1.003,y*1.003,z*1.003); ring.lookAt(0,0,0); grp.add(ring);
+    });
+
+    // ── Orbital ring (animated)
+    const orbPts=[];
+    for(let i=0;i<=120;i++){
+      const a=i/120*Math.PI*2;
+      orbPts.push(new THREE.Vector3(Math.cos(a)*1.25, Math.sin(a*0.28)*0.12, Math.sin(a)*1.25));
+    }
+    const orbLine=new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(orbPts),
+      new THREE.LineBasicMaterial({color:0x00f5ff,transparent:true,opacity:0.45})
+    );
+    scene.add(orbLine);   // scene (not grp) so it doesn't rotate with globe
+
+    // Traveler dot on orbital
+    const traveler=new THREE.Mesh(
+      new THREE.SphereGeometry(0.038,8,8),
+      new THREE.MeshBasicMaterial({color:0x00f5ff})
+    );
+    scene.add(traveler);
+    // Traveler glow halo
+    const travHalo=new THREE.Mesh(
+      new THREE.SphereGeometry(0.06,8,8),
+      new THREE.MeshBasicMaterial({color:0x00f5ff,transparent:true,opacity:0.15})
+    );
+    traveler.add(travHalo);
+
+    // ── Atmosphere glow shell
+    scene.add(new THREE.Mesh(
+      new THREE.SphereGeometry(1.09,32,32),
+      new THREE.MeshBasicMaterial({color:0x00f5ff,transparent:true,opacity:0.04,side:THREE.BackSide})
+    ));
+    scene.add(new THREE.Mesh(
+      new THREE.SphereGeometry(1.14,32,32),
+      new THREE.MeshBasicMaterial({color:0x00c5ff,transparent:true,opacity:0.02,side:THREE.BackSide})
+    ));
+
+    // ── Lights
+    scene.add(new THREE.AmbientLight(0x112233,2));
+    const pl=new THREE.PointLight(0x00f5ff,2,10);
+    pl.position.set(3,2,3); scene.add(pl);
+    const pl2=new THREE.PointLight(0xc8ff00,0.8,8);
+    pl2.position.set(-3,-1,-2); scene.add(pl2);
+
+    (function loopGlobe(){
+      requestAnimationFrame(loopGlobe);
+      st.globeT += 0.007;
+      grp.rotation.y  = st.globeT * 0.28;
+      grp.rotation.x  = st.nY * 0.25;
+      orbLine.rotation.y = -st.globeT * 0.12;
+
+      const ta=st.globeT*1.4;
+      traveler.position.set(Math.cos(ta)*1.25, Math.sin(ta*0.28)*0.12, Math.sin(ta)*1.25);
+      R.render(scene,cam);
+    })();
+  }
+
+  /* ═════════════ PERSPECTIVE GRID CANVAS ═════════════ */
+  function initGrid() {
+    const canvas=els.gridCanvas; if(!canvas) return;
+    const ctx=canvas.getContext('2d');
+    let W,H;
+    function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight*.45; }
+    resize();
+    window.addEventListener('resize',resize,{passive:true});
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      const vx=W/2, vy=H*.04;
+      const rows=18, cols=24;
+      // Horizontal lines
+      for(let r=0;r<=rows;r++){
+        const t=r/rows, y=vy+(H-vy)*(t*t);
+        const xl=W*(.5-t*.5), xr=W*(.5+t*.5);
+        ctx.beginPath(); ctx.strokeStyle=`rgba(0,245,255,${t*.24})`; ctx.lineWidth=t<.2?.5:1;
+        ctx.moveTo(xl,y); ctx.lineTo(xr,y); ctx.stroke();
+      }
+      // Vertical lines
+      for(let c=0;c<=cols;c++){
+        const t=c/cols,bx=W*t;
+        ctx.beginPath(); ctx.strokeStyle=`rgba(0,245,255,${Math.max(0,.18-Math.abs(t-.5)*.2)})`;
+        ctx.lineWidth=.5; ctx.moveTo(vx+(bx-vx)*0, vy); ctx.lineTo(bx, H); ctx.stroke();
+      }
+      // Horizon glow
+      const hg=ctx.createLinearGradient(0,vy-2,0,vy+8);
+      hg.addColorStop(0,'rgba(0,245,255,0)'); hg.addColorStop(.5,'rgba(0,245,255,.5)'); hg.addColorStop(1,'rgba(0,245,255,0)');
+      ctx.fillStyle=hg; ctx.fillRect(0,vy-2,W,10);
+    }
+    draw();
+    window.addEventListener('resize',draw,{passive:true});
+  }
+
+  /* ════════════════ MATRIX RAIN ═══════════════════════ */
+  function initMatrix() {
+    const canvas=els.matrixCanvas; if(!canvas) return;
+    const ctx=canvas.getContext('2d');
+    function resize(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+    resize(); window.addEventListener('resize',resize,{passive:true});
+    const chars='01アイウエオカキサシスタチツABCDEF0123456789';
+    const fs=13; let cols=Math.floor(canvas.width/fs);
+    let drops=Array.from({length:cols},()=>Math.random()*-100);
+    setInterval(()=>{
+      ctx.fillStyle='rgba(5,5,8,0.06)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      for(let i=0;i<drops.length;i++){
+        const ch=chars[Math.floor(Math.random()*chars.length)];
+        const x=i*fs, y=drops[i]*fs;
+        const head=(drops[i]%1)<.06;
+        ctx.fillStyle=head?`rgba(255,255,255,${.7+Math.random()*.3})`:`rgba(200,255,0,${.15+Math.random()*.55})`;
+        ctx.font=`${fs}px 'JetBrains Mono',monospace`;
+        ctx.fillText(ch,x,y);
+        if(y>canvas.height&&Math.random()>.975) drops[i]=0;
+        drops[i]+=.55;
+      }
+    },48);
+  }
+
+  /* ═══════════════ TERMINAL ENGINE ════════════════════ */
+  const CMD = { help,whoami,ls,status,nmap,scan,hack,ctf,projects,ping,join,clear,exit:cmdExit };
 
   function bootTerminal() {
-    const lines = [
-      { text: '> Initialising SCS-OS v4.0.0 kernel...', delay: 150,  cls: 'info' },
-      { text: '> Loading threat intelligence corpus... OK', delay: 500,  cls: 'success' },
-      { text: '> Mounting encrypted filesystem AES-256... OK', delay: 900,  cls: 'success' },
-      { text: '> Establishing VPN tunnel [TUN0]... OK', delay: 1300, cls: 'success' },
-      { text: '> Spawning auditor daemon... OK', delay: 1700, cls: 'success' },
-      { text: '', delay: 2000, cls: '' },
-      { text: '> System ready. Type "help" for available commands.', delay: 2200, cls: 'info' },
-    ];
-    lines.forEach(({ text, delay, cls }) => {
-      setTimeout(() => printLine(text, cls), delay);
-    });
-    // Set session ID
-    const sid = document.getElementById('cin-session-id');
-    if (sid) sid.textContent = Math.random().toString(36).slice(2, 10).toUpperCase();
+    [
+      {t:'> Initialising SCS-OS v4.0 kernel...',      d:150,  c:'info'},
+      {t:'> Loading threat intelligence corpus... [OK]',d:550,  c:'success'},
+      {t:'> Mounting encrypted filesystem AES-256... [OK]',d:950, c:'success'},
+      {t:'> Establishing VPN tunnel [TUN0]... [OK]',   d:1350, c:'success'},
+      {t:'> System ready. Type "help" for commands.',   d:1800, c:'info'},
+    ].forEach(({t,d,c})=>setTimeout(()=>printLine(t,c),d));
+    if(els.sessionId) els.sessionId.textContent=Math.random().toString(36).slice(2,10).toUpperCase();
   }
 
-  function printLine(text, cls = '') {
-    if (!els.termOutput) return;
-    const div = document.createElement('div');
-    div.className = `term-out-line ${cls}`;
-    // Allow basic HTML spans for coloured segments
-    div.innerHTML = text
-      .replace(/\[OK\]/g, '<span style="color:#27c93f">[OK]</span>')
-      .replace(/\[FAIL\]/g, '<span style="color:#ff5f56">[FAIL]</span>')
-      .replace(/\[WARN\]/g, '<span style="color:#ffbd2e">[WARN]</span>');
-    els.termOutput.appendChild(div);
-    scrollTerm();
-  }
-
-  function printLines(lines) {
-    lines.forEach((l, i) => {
-      setTimeout(() => printLine(l.text || l, l.cls || ''), i * 55);
-    });
-  }
-
-  function scrollTerm() {
-    if (els.termBody) {
-      els.termBody.scrollTop = els.termBody.scrollHeight;
-    }
-  }
-
-  function echoCmd(cmd) {
-    if (!els.termOutput) return;
-    const d = document.createElement('div');
-    d.className = 'term-out-line';
-    d.innerHTML = `<span style="color:var(--acid)">guest@scs:~$</span> <span style="color:var(--white)">${escHtml(cmd)}</span>`;
+  function printLine(text,cls=''){
+    if(!els.termOutput) return;
+    const d=document.createElement('div');
+    d.className=`term-out-line ${cls}`;
+    d.innerHTML=text.replace(/\[OK\]/g,'<span style="color:#27c93f">[OK]</span>').replace(/\[FAIL\]/g,'<span style="color:#ff5f56">[FAIL]</span>');
     els.termOutput.appendChild(d);
-    scrollTerm();
+    els.termBody&&(els.termBody.scrollTop=els.termBody.scrollHeight);
   }
-
-  function escHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function printLines(lines){ lines.forEach((l,i)=>setTimeout(()=>printLine(l.t||l,l.c||''),i*55)); }
+  function echoCmd(cmd){
+    if(!els.termOutput) return;
+    const d=document.createElement('div'); d.className='term-out-line';
+    d.innerHTML=`<span style="color:var(--acid)">guest@scs:~$</span> <span style="color:var(--white)">${esc(cmd)}</span>`;
+    els.termOutput.appendChild(d);
+    els.termBody&&(els.termBody.scrollTop=els.termBody.scrollHeight);
   }
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-  /* ─── COMMANDS ─── */
-  function help() {
-    printLines([
-      { text: '┌─ SCS COMMAND INTERFACE ─────────────────────────────────┐', cls: 'info' },
-      { text: '│  help      — Show this menu                               │', cls: 'dim' },
-      { text: '│  whoami    — Display identity card                        │', cls: 'dim' },
-      { text: '│  ls        — List directory                               │', cls: 'dim' },
-      { text: '│  status    — Live system diagnostics                      │', cls: 'dim' },
-      { text: '│  nmap      — Network reconnaissance scan                  │', cls: 'dim' },
-      { text: '│  scan      — Vulnerability scanner                        │', cls: 'dim' },
-      { text: '│  hack      — Initiate breach simulation                   │', cls: 'warn' },
-      { text: '│  decrypt   — Decrypt a sample payload                     │', cls: 'warn' },
-      { text: '│  ctf       — CTF leaderboard                              │', cls: 'dim' },
-      { text: '│  projects  — Open research projects                       │', cls: 'dim' },
-      { text: '│  join      — Recruitment portal (redirects)               │', cls: 'success' },
-      { text: '│  ping      — Ping SCS network nodes                       │', cls: 'dim' },
-      { text: '│  man [cmd] — Manual for a command                         │', cls: 'dim' },
-      { text: '│  echo      — Echo a string                                │', cls: 'dim' },
-      { text: '│  clear     — Clear terminal output                        │', cls: 'dim' },
-      { text: '│  exit      — Close terminal / scroll to top               │', cls: 'dim' },
-      { text: '└───────────────────────────────────────────────────────────┘', cls: 'info' },
-    ]);
+  function help(){ printLines([
+    {t:'┌─ SCS COMMANDS ──────────────────────────────────────────────┐',c:'info'},
+    {t:'│ help     whoami   ls        status    nmap     scan          │',c:'dim'},
+    {t:'│ hack     ctf      projects  ping      join     clear   exit  │',c:'dim'},
+    {t:'└──────────────────────────────────────────────────────────────┘',c:'info'},
+  ]); }
+  function whoami(){ const s=Math.random().toString(36).slice(2,10).toUpperCase(); printLines([
+    {t:'╔══ IDENTITY RECORD ══════════════════════════════════════════╗',c:'info'},
+    {t:'║  USER   : guest                                              ║'},
+    {t:'║  ROLE   : Unauthenticated Visitor                           ║',c:'warn'},
+    {t:'║  ACCESS : LEVEL 0 — Read Only                               ║'},
+    {t:`║  SESSION: ${s}-GUEST                                     ║`,c:'info'},
+    {t:'╚═════════════════════════════════════════════════════════════╝',c:'info'},
+    {t:'  → Join SCS to upgrade: join.html',c:'success'},
+  ]); }
+  function ls(){ printLines([
+    {t:'drwxr-xr-x  scs-core/',c:'info'},{t:'drwxr-x---  red-team/  [LOCKED]',c:'warn'},
+    {t:'drwxr-x---  blue-team/ [LOCKED]',c:'warn'},{t:'drwxr-x---  osint/     [LOCKED]',c:'warn'},
+    {t:'-rw-r--r--  README.md'},{t:'-rwx------  ./init_membership [LOCKED]',c:'error'},
+  ]); }
+  function status(){ printLines([
+    {t:'── LIVE SYSTEM STATUS ─────────────────────────────────────',c:'info'},
+    {t:`  Threats blocked : ${(Math.floor(Math.random()*600)+1200).toLocaleString()}`,c:'success'},
+    {t:`  Node integrity  : ${Math.floor(Math.random()*10+86)}%`,c:'success'},
+    {t:'  IDS             : ACTIVE',c:'success'},{t:'  Honeypots       : 14 deployed',c:'warn'},
+    {t:`  CTF running     : YES — Round #${Math.floor(Math.random()*10+1)}`,c:'warn'},
+    {t:'──────────────────────────────────────────────────────────',c:'info'},
+  ]); }
+  function nmap(raw){ const ip=`192.168.${~~(Math.random()*255)}.${~~(Math.random()*255)}`; const ports={22:'ssh',80:'http',443:'https',3389:'rdp',8080:'proxy'};
+    printLine(`Nmap → ${(raw||'').replace('nmap','').trim()||'scs.local'} (${ip})`, 'info');
+    Object.entries(ports).forEach(([p,s],i)=>setTimeout(()=>printLine(`  ${p.padEnd(7)} ${Math.random()>.38?'open  ':'closed'} ${s}`,Math.random()>.38?'success':'dim'),i*80));
+    setTimeout(()=>printLine(`Done — scanned in ${(Math.random()*3+1).toFixed(2)}s`,'info'),500);
   }
-
-  function whoami() {
-    const sess = Math.random().toString(36).slice(2, 10).toUpperCase();
-    printLines([
-      { text: '╔══ IDENTITY RECORD ════════════════════════════════════════╗', cls: 'info' },
-      { text: '║  USER     :  guest                                         ║', cls: '' },
-      { text: '║  ROLE     :  Unauthenticated Visitor                       ║', cls: 'warn' },
-      { text: '║  ACCESS   :  LEVEL 0 — Read Only                          ║', cls: '' },
-      { text: '║  GEO      :  [REDACTED BY IDS]                             ║', cls: 'dim' },
-      { text: '║  SHELL    :  /bin/scs-bash v4.0.0                          ║', cls: '' },
-      { text: `║  SESSION  :  ${sess}-GUEST                              ║`, cls: 'info' },
-      { text: '╚══════════════════════════════════════════════════════════════╝', cls: 'info' },
-      { text: '  → Upgrade access by joining SCS: join.html', cls: 'success' },
-    ]);
+  function scan(){ [{t:'[*] Initialising scanner...',c:'info',d:0},{t:'[!] CVE-2023-1234 — Log4j [CRITICAL]',c:'error',d:600},{t:'[!] CVE-2022-0847 — DirtyPipe [HIGH]',c:'error',d:1100},{t:'[~] CVE-2021-3156 — sudo overflow [MEDIUM]',c:'warn',d:1600},{t:'Scan complete. 3 CVEs found.',c:'info',d:2100}].forEach(({t,c,d})=>setTimeout(()=>printLine(t,c),d)); }
+  function hack(){ [{t:'[!] INITIATING BREACH SEQUENCE...',c:'hack',d:0},{t:'[*] Scanning attack surface...',c:'info',d:400},{t:'[*] Vectors found: SSH, HTTP, SMB',c:'warn',d:800},{t:'[*] SQL injection... [FAIL]',c:'error',d:1200},{t:'[+] Discovered /admin/upload — unrestricted!',c:'success',d:1800},{t:'  ████████████████░░░░  82%...',c:'hack',d:2400},{t:'[!] COUNTERMEASURE TRIGGERED — ABORT',c:'error',d:3000},{t:'  SCS: Only hack what you own. → join.html',c:'warn',d:3400}].forEach(({t,c,d})=>setTimeout(()=>printLine(t,c),d)); }
+  function ctf(){ printLines([
+    {t:'┌─ CTF LEADERBOARD ─────────────────────────────────────┐',c:'info'},
+    {t:'│  #1  0xDeadBeef     4,820 pts  🏆                      │',c:'hack'},
+    {t:'│  #2  n4cr0m4nc3r    4,210 pts                          │'},
+    {t:'│  #3  shellsh3ll     3,890 pts                          │'},
+    {t:'│  ??? guest          0 pts  [join first]                │',c:'warn'},
+    {t:'└───────────────────────────────────────────────────────┘',c:'info'},
+  ]); }
+  function projects(){ printLines([
+    {t:'── ACTIVE RESEARCH ────────────────────────────────',c:'info'},
+    {t:'  [1] AstraNet   — Threat intelligence aggregator'},{t:'  [2] HexLens    — Browser hex editor + disassembler'},
+    {t:'  [3] ShadowVM   — Malware analysis sandbox'},{t:'  → projects.html',c:'success'},
+  ]); }
+  function ping(raw){ const h=(raw||'').replace('ping','').trim()||'scs.local';
+    printLine(`PING ${h}`,'info');
+    for(let i=0;i<4;i++) setTimeout(()=>printLine(`64 bytes from ${h}: seq=${i+1} ttl=64 time=${(Math.random()*8+1).toFixed(1)}ms`,'success'),i*350);
+    setTimeout(()=>printLine('4 transmitted, 4 received, 0% loss','success'),1500);
   }
+  function join(){ printLines([{t:'[*] Opening recruitment portal...',c:'info'},{t:'[+] Redirecting to join.html...',c:'success'}]); setTimeout(()=>{window.location.href='join.html';},1800); }
+  function clear(){ if(els.termOutput) els.termOutput.innerHTML=''; }
+  function cmdExit(){ printLines([{t:'[*] Terminating session...',c:'warn'},{t:'[+] Goodbye.',c:'info'}]); setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),900); }
 
-  function ls(raw) {
-    const path = (raw || '').replace('ls', '').trim() || '/home/guest';
-    printLines([
-      { text: `Listing: ${path}`, cls: 'dim' },
-      { text: 'total 9', cls: 'dim' },
-      { text: 'drwxr-xr-x  scs-core/', cls: 'info' },
-      { text: 'drwxr-x---  red-team/         [LOCKED — member only]', cls: 'warn' },
-      { text: 'drwxr-x---  blue-team/        [LOCKED — member only]', cls: 'warn' },
-      { text: 'drwxr-x---  osint/            [LOCKED — member only]', cls: 'warn' },
-      { text: 'drwxr-x---  ctf-writeups/     [LOCKED — member only]', cls: 'warn' },
-      { text: '-rw-r--r--  README.md', cls: '' },
-      { text: '-rw-r--r--  manifesto.txt', cls: '' },
-      { text: '-rwx------  ./init_membership  [LOCKED]', cls: 'error' },
-      { text: '', cls: '' },
-      { text: '  Unlock restricted dirs: run "join"', cls: 'dim' },
-    ]);
-  }
-
-  function status() {
-    const threats = Math.floor(Math.random() * 600 + 1200);
-    const nodes   = Math.floor(Math.random() * 10  + 86);
-    const ctfRnd  = Math.floor(Math.random() * 10  + 1);
-    const upDays  = Math.floor(Math.random() * 99  + 1);
-    const upHrs   = Math.floor(Math.random() * 23);
-    const sess    = Math.floor(Math.random() * 8   + 3);
-    printLines([
-      { text: '── LIVE SYSTEM STATUS ──────────────────────────────────────', cls: 'info' },
-      { text: `  Threats blocked   : ${threats.toLocaleString()}`, cls: 'success' },
-      { text: `  Node integrity    : ${nodes}%`, cls: 'success' },
-      { text: `  Active sessions   : ${sess}`, cls: '' },
-      { text: `  CTF running       : YES — Round #${ctfRnd}`, cls: 'warn' },
-      { text: `  Uptime            : ${upDays}d ${upHrs}h`, cls: '' },
-      { text: '  IDS               : ACTIVE', cls: 'success' },
-      { text: '  Honeypots         : 14 deployed', cls: 'warn' },
-      { text: '  VPN               : TUN0 CONNECTED', cls: 'success' },
-      { text: '────────────────────────────────────────────────────────────', cls: 'info' },
-    ]);
-  }
-
-  function nmap(raw) {
-    const target = (raw || '').replace('nmap', '').trim() || 'scs.local';
-    const ip = `192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
-    const portMap = { 22:'ssh', 80:'http', 443:'https', 3389:'rdp', 8080:'http-proxy', 4444:'krb524', 53:'dns', 21:'ftp' };
-    const lines = [
-      { text: `Starting nmap 7.94 → ${target} (${ip})`, cls: 'info' },
-      { text: 'HOST IS UP — latency 1.2ms', cls: 'success' },
-      { text: 'PORT       STATE    SERVICE', cls: 'dim' },
-    ];
-    Object.entries(portMap).forEach(([p, svc]) => {
-      const open = Math.random() > 0.38;
-      lines.push({ text: `  ${p.padEnd(9)}${open?'open  ':'closed'}  ${svc}`, cls: open ? 'success' : 'dim' });
-    });
-    lines.push({ text: `Nmap done — 1 IP scanned in ${(Math.random()*3+1).toFixed(2)}s`, cls: 'info' });
-    lines.forEach(({ text, cls }, i) => {
-      setTimeout(() => printLine(text, cls), i * 90);
-    });
-  }
-
-  function scan() {
-    const stages = [
-      { text: '[*] Initialising vulnerability scanner v2.4...', cls: 'info', d: 0 },
-      { text: '[*] Detecting open services...', cls: 'info', d: 400 },
-      { text: '[!] CVE-2023-1234 — Apache Log4j [CRITICAL]', cls: 'error', d: 900 },
-      { text: '[!] CVE-2022-0847 — Linux DirtyPipe [HIGH]', cls: 'error', d: 1300 },
-      { text: '[~] CVE-2021-3156 — sudo heap overflow [MEDIUM]', cls: 'warn', d: 1700 },
-      { text: '[+] No SMB signing vulnerabilities detected.', cls: 'success', d: 2100 },
-      { text: '── Scan complete. 3 CVEs found. ──', cls: 'info', d: 2500 },
-    ];
-    stages.forEach(({ text, cls, d }) => setTimeout(() => printLine(text, cls), d));
-  }
-
-  function hack() {
-    const seq = [
-      { text: '[!] INITIATING BREACH SIMULATION...', cls: 'hack', d: 0 },
-      { text: '[*] Recon phase — scanning attack surface...', cls: 'info', d: 400 },
-      { text: '[*] Found vectors: SSH:22, HTTP:80, SMB:445', cls: 'warn', d: 800 },
-      { text: '[*] Attempting SQL injection... [FAIL]', cls: 'error', d: 1200 },
-      { text: '[*] Deploying XSS payload... [FAIL]', cls: 'error', d: 1600 },
-      { text: '[*] Fuzzing endpoint parameters...', cls: 'info', d: 2100 },
-      { text: '[+] Discovered /admin/upload — unrestricted!', cls: 'success', d: 2600 },
-      { text: '[*] Crafting RCE payload...', cls: 'info', d: 3100 },
-      { text: '  ████████████████████░░░░  86%...', cls: 'hack', d: 3600 },
-      { text: '[!] COUNTERMEASURE TRIGGERED — SESSION RESET', cls: 'error', d: 4100 },
-      { text: '', cls: '', d: 4400 },
-      { text: '  SCS reminds you: Hack only what you own.', cls: 'warn', d: 4600 },
-      { text: '  → Learn legal hacking with us: join.html', cls: 'success', d: 4900 },
-    ];
-    seq.forEach(({ text, cls, d }) => setTimeout(() => printLine(text, cls), d));
-  }
-
-  function decrypt() {
-    const payload = btoa('SCS_SECRET_' + Date.now()).slice(0, 24);
-    const seq = [
-      { text: '[*] Loading encrypted payload...', cls: 'info', d: 0 },
-      { text: `[*] Payload: ${payload}`, cls: 'dim', d: 500 },
-      { text: '[*] Attempting AES-256 brute-force...', cls: 'warn', d: 1000 },
-      { text: '  ▓▓▓▓▓▓▓▓░░░░░░░░  48%...', cls: 'hack', d: 1600 },
-      { text: '[!] Insufficient compute — keyspace too large.', cls: 'error', d: 2300 },
-      { text: '[+] Fallback: dictionary attack phase...', cls: 'info', d: 2800 },
-      { text: '[!] DECRYPTION FAILED — 256-bit encryption holds.', cls: 'error', d: 3400 },
-      { text: '', cls: '', d: 3600 },
-      { text: '  Use proper cryptanalysis. See our workshops: events.html', cls: 'success', d: 3800 },
-    ];
-    seq.forEach(({ text, cls, d }) => setTimeout(() => printLine(text, cls), d));
-  }
-
-  function ctf() {
-    printLines([
-      { text: '┌─ CTF LEADERBOARD (CURRENT ROUND #7) ───────────────────────┐', cls: 'info' },
-      { text: '│  Rank   Handle          Score      Status                    │', cls: 'dim' },
-      { text: '│  #1     0xDeadBeef      4,820 pts  🏆 CHAMPION               │', cls: 'hack' },
-      { text: '│  #2     n4cr0m4nc3r     4,210 pts                             │', cls: '' },
-      { text: '│  #3     shellsh3ll      3,890 pts                             │', cls: '' },
-      { text: '│  #4     bufferfl0w      3,542 pts                             │', cls: '' },
-      { text: '│  #5     p4ss-the-hash   3,120 pts                             │', cls: '' },
-      { text: '│  ...    ......          ....                                  │', cls: 'dim' },
-      { text: '│  ???    guest           0 pts      [join to participate]       │', cls: 'warn' },
-      { text: '└───────────────────────────────────────────────────────────────┘', cls: 'info' },
-    ]);
-  }
-
-  function projects() {
-    printLines([
-      { text: '── ACTIVE RESEARCH PROJECTS ──────────────────────────────────', cls: 'info' },
-      { text: '  [1] AstraNet — Distributed threat intelligence aggregator', cls: '' },
-      { text: '      Status: ACTIVE  |  Language: Python, Go', cls: 'dim' },
-      { text: '  [2] HexLens — Browser-based hex editor + disassembler', cls: '' },
-      { text: '      Status: BETA    |  Language: TypeScript, WASM', cls: 'dim' },
-      { text: '  [3] ShadowVM — Isolated malware analysis sandbox', cls: '' },
-      { text: '      Status: ACTIVE  |  Language: Rust, C', cls: 'dim' },
-      { text: '  [4] CipherMap — Visual cryptography training tool', cls: '' },
-      { text: '      Status: PLANNING', cls: 'dim' },
-      { text: '──────────────────────────────────────────────────────────────', cls: 'info' },
-      { text: '  → See all projects: projects.html', cls: 'success' },
-    ]);
-  }
-
-  function ping(raw) {
-    const host = (raw || '').replace('ping', '').trim() || 'scs.local';
-    const lines = [{ text: `PING ${host} — 56 bytes`, cls: 'info' }];
-    for (let i = 0; i < 4; i++) {
-      const ms = (Math.random() * 8 + 1).toFixed(1);
-      lines.push({ text: `64 bytes from ${host}: seq=${i+1} ttl=64 time=${ms}ms`, cls: 'success', d: i * 350 });
-    }
-    lines.push({ text: `4 transmitted, 4 received — 0% loss`, cls: 'success', d: 1500 });
-    lines.forEach(({ text, cls, d = 0 }, i) => setTimeout(() => printLine(text, cls), i * 350));
-  }
-
-  function man(raw) {
-    const cmd = (raw || '').replace('man', '').trim();
-    const docs = {
-      hack:    '  hack — Simulates a breach sequence against a sandboxed target.',
-      nmap:    '  nmap [host] — Performs a TCP SYN scan on the target host.',
-      scan:    '  scan — Runs a CVE vulnerability assessment on the local subnet.',
-      decrypt: '  decrypt — Attempts to decrypt a demo AES-256 payload.',
-      ctf:     '  ctf — Displays the current CTF round leaderboard.',
-      status:  '  status — Dumps real-time system metrics.',
-    };
-    if (docs[cmd]) {
-      printLine('MANUAL ENTRY', 'info');
-      printLine(docs[cmd]);
-    } else {
-      printLine(`No manual entry for "${cmd}". Try "help" for command list.`, 'warn');
-    }
-  }
-
-  function echo(raw) {
-    const msg = (raw || '').replace(/^echo\s*/i, '');
-    printLine(msg || '');
-  }
-
-  function join() {
-    printLines([
-      { text: '[*] Opening SCS recruitment portal...', cls: 'info' },
-      { text: '[+] Redirecting to join.html in 2 seconds...', cls: 'success' },
-    ]);
-    setTimeout(() => { window.location.href = 'join.html'; }, 2000);
-  }
-
-  function clear() {
-    if (els.termOutput) els.termOutput.innerHTML = '';
-  }
-
-  function exit() {
-    printLines([
-      { text: '[*] Terminating session...', cls: 'warn' },
-      { text: '[+] Goodbye, guest.', cls: 'info' },
-    ]);
-    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 900);
-  }
-
-  /* ─── INPUT HANDLER + HISTORY ─── */
-  function initTerminal() {
-    if (!els.termInput) return;
-
-    els.termInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const raw = els.termInput.value.trim();
-        if (!raw) return;
-
-        // History
-        st.cmdHistory.unshift(raw);
-        if (st.cmdHistory.length > 50) st.cmdHistory.pop();
-        st.cmdHistoryIdx = -1;
-        st.currentCmd = '';
-
-        const cmd = raw.toLowerCase().split(' ')[0];
-        echoCmd(raw);
-        els.termInput.value = '';
-
-        if (COMMANDS[cmd]) {
-          COMMANDS[cmd](raw);
-        } else {
-          printLine(`Command not found: ${escHtml(cmd)} — type "help"`, 'error');
-        }
-
-      } else if (e.key === 'ArrowUp') {
+  function initTerminal(){
+    if(!els.termInput) return;
+    els.termInput.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){
+        const raw=els.termInput.value.trim(); if(!raw) return;
+        st.cmdHistory.unshift(raw); st.cmdHistoryIdx=-1; st.currentCmd='';
+        const cmd=raw.toLowerCase().split(' ')[0];
+        echoCmd(raw); els.termInput.value='';
+        CMD[cmd] ? CMD[cmd](raw) : printLine(`Command not found: ${esc(cmd)} — type "help"`, 'error');
+      } else if(e.key==='ArrowUp'){
         e.preventDefault();
-        if (st.cmdHistoryIdx === -1) st.currentCmd = els.termInput.value;
-        st.cmdHistoryIdx = Math.min(st.cmdHistoryIdx + 1, st.cmdHistory.length - 1);
-        els.termInput.value = st.cmdHistory[st.cmdHistoryIdx] || '';
-
-      } else if (e.key === 'ArrowDown') {
+        if(st.cmdHistoryIdx===-1) st.currentCmd=els.termInput.value;
+        st.cmdHistoryIdx=Math.min(st.cmdHistoryIdx+1,st.cmdHistory.length-1);
+        els.termInput.value=st.cmdHistory[st.cmdHistoryIdx]||'';
+      } else if(e.key==='ArrowDown'){
         e.preventDefault();
-        st.cmdHistoryIdx = Math.max(st.cmdHistoryIdx - 1, -1);
-        els.termInput.value = st.cmdHistoryIdx === -1 ? st.currentCmd : st.cmdHistory[st.cmdHistoryIdx];
-
-      } else if (e.key === 'Tab') {
+        st.cmdHistoryIdx=Math.max(st.cmdHistoryIdx-1,-1);
+        els.termInput.value=st.cmdHistoryIdx===-1?st.currentCmd:st.cmdHistory[st.cmdHistoryIdx];
+      } else if(e.key==='Tab'){
         e.preventDefault();
-        const partial = els.termInput.value.trim().toLowerCase();
-        const matches = Object.keys(COMMANDS).filter(c => c.startsWith(partial));
-        if (matches.length === 1) {
-          els.termInput.value = matches[0];
-        } else if (matches.length > 1) {
-          printLine(matches.join('  '), 'dim');
-        }
+        const p=els.termInput.value.trim().toLowerCase();
+        const m=Object.keys(CMD).filter(c=>c.startsWith(p));
+        if(m.length===1) els.termInput.value=m[0];
+        else if(m.length>1) printLine(m.join('  '),'dim');
       }
     });
-
-    // Quick buttons
-    document.querySelectorAll('.cin-quick-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const cmd = btn.dataset.cmd;
-        if (!cmd) return;
-        echoCmd(cmd);
-        if (COMMANDS[cmd]) COMMANDS[cmd](cmd);
-        els.termInput && els.termInput.focus();
+    document.querySelectorAll('.cin-quick-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const cmd=btn.dataset.cmd; if(!cmd) return;
+        echoCmd(cmd); CMD[cmd]&&CMD[cmd](cmd);
+        els.termInput&&els.termInput.focus();
       });
     });
-
-    // Mac traffic light dots
-    const dotClose = document.getElementById('cin-dot-close');
-    const dotMin   = document.getElementById('cin-dot-min');
-    const dotFull  = document.getElementById('cin-dot-full');
-
-    if (dotClose) {
-      dotClose.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
-    if (dotMin) {
-      dotMin.addEventListener('click', () => {
-        const max = window.innerHeight * 4;
-        window.scrollTo({ top: max * 0.6, behavior: 'smooth' });
-      });
-    }
-    if (dotFull) {
-      dotFull.addEventListener('click', () => {
-        const el = document.getElementById('cin-term');
-        if (!el) return;
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        } else {
-          el.requestFullscreen().catch(() => {});
-        }
-      });
-    }
-  }
-
-  /* ════════════════════════════════════════════════════
-     LIVE STATS
-     ════════════════════════════════════════════════════ */
-  function initLiveStats() {
-    const threatEl = document.getElementById('cin-stat-threats');
-    const nodeEl   = document.getElementById('cin-stat-nodes');
-    const ctfEl    = document.getElementById('cin-stat-ctf');
-
-    let threats = 1247;
-    let nodes   = 94;
-
-    if (ctfEl) ctfEl.textContent = '#7';
-
-    setInterval(() => {
-      threats += Math.floor(Math.random() * 12);
-      nodes    = Math.max(80, Math.min(99, nodes + (Math.random() > 0.55 ? 1 : -1)));
-      if (threatEl) threatEl.textContent = threats.toLocaleString();
-      if (nodeEl)   nodeEl.textContent   = nodes + '%';
-    }, 2400);
-  }
-
-  /* ════════════════════════════════════════════════════
-     REAL-TIME CLOCK
-     ════════════════════════════════════════════════════ */
-  function initClock() {
-    const el = document.getElementById('cin-clock');
-    const tick = () => {
-      if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
-    };
-    tick();
-    setInterval(tick, 1000);
-  }
-
-  /* ════════════════════════════════════════════════════
-     NAVBAR
-     ════════════════════════════════════════════════════ */
-  function initNav() {
-    const burger = document.querySelector('.cin-nav-hamburger');
-    const links  = document.querySelector('.cin-nav-links');
-    if (!burger || !links) return;
-    burger.addEventListener('click', () => {
-      const open = links.style.display === 'flex';
-      links.style.display = open ? 'none' : 'flex';
-      if (!open) {
-        links.style.flexDirection = 'column';
-        links.style.position = 'absolute';
-        links.style.top = '60px';
-        links.style.left = '50%';
-        links.style.transform = 'translateX(-50%)';
-        links.style.background = 'rgba(5,5,8,0.95)';
-        links.style.border = '1px solid rgba(200,255,0,0.1)';
-        links.style.borderRadius = '12px';
-        links.style.padding = '12px';
-        links.style.gap = '6px';
-        links.style.backdropFilter = 'blur(20px)';
-      }
+    // Traffic light dots
+    document.getElementById('cin-dot-close')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+    document.getElementById('cin-dot-min')?.addEventListener('click',()=>window.scrollTo({top:window.innerHeight*4*.6,behavior:'smooth'}));
+    document.getElementById('cin-dot-full')?.addEventListener('click',()=>{
+      const el=document.getElementById('cin-term');
+      if(!el) return;
+      document.fullscreenElement?document.exitFullscreen():el.requestFullscreen().catch(()=>{});
     });
   }
 
-  /* ════════════════════════════════════════════════════
-     RESIZE HANDLER
-     ════════════════════════════════════════════════════ */
-  function initResize() {
-    window.addEventListener('resize', () => {
-      // Recalculate on resize
-    }, { passive: true });
+  /* ══════════════════ LIVE STATS ══════════════════════ */
+  function initLiveStats(){
+    let threats=1247, nodes=94;
+    if(els.thrCtf) els.thrCtf.textContent='#7';
+    setInterval(()=>{
+      threats+=Math.floor(Math.random()*12);
+      nodes=Math.max(80,Math.min(99,nodes+(Math.random()>.55?1:-1)));
+      if(els.thrThreat) els.thrThreat.textContent=threats.toLocaleString();
+      if(els.thrNodes)  els.thrNodes.textContent=nodes+'%';
+    },2400);
   }
 
-  /* ════════════════════════════════════════════════════
-     BOOT
-     ════════════════════════════════════════════════════ */
-  function init() {
+  /* ══════════════════ CLOCK ═══════════════════════════ */
+  function initClock(){
+    const tick=()=>{ if(els.clock) els.clock.textContent=new Date().toLocaleTimeString('en-GB',{hour12:false}); };
+    tick(); setInterval(tick,1000);
+  }
+
+  /* ══════════════════ NAVBAR ══════════════════════════ */
+  function initNav(){
+    const b=document.querySelector('.cin-nav-hamburger');
+    const l=document.querySelector('.cin-nav-links');
+    if(!b||!l) return;
+    b.addEventListener('click',()=>{
+      const open=l.style.display==='flex';
+      Object.assign(l.style,open?{display:'none'}:{
+        display:'flex',flexDirection:'column',position:'absolute',
+        top:'60px',left:'50%',transform:'translateX(-50%)',
+        background:'rgba(5,5,8,.96)',border:'1px solid rgba(200,255,0,.1)',
+        borderRadius:'12px',padding:'12px',gap:'6px',backdropFilter:'blur(20px)',zIndex:'100',
+      });
+    });
+  }
+
+  /* nX/nY smooth update (called from rAF) */
+  function updateNXY(){
+    st.nX += (st.targetNX - st.nX) * .06;
+    st.nY += (st.targetNY - st.nY) * .06;
+    requestAnimationFrame(updateNXY);
+  }
+
+  /* ══════════════════ BOOT ════════════════════════════ */
+  function init(){
     resolveEls();
-    initScroll();
     initMouse();
-    initThreeBackground();
+    initGSAP();
+    buildStarfield();
+    buildGlobe();
     initGrid();
     initMatrix();
     initTerminal();
     initLiveStats();
     initClock();
     initNav();
-    initProgressDots();
-    initResize();
+    updateNXY();
 
-    requestAnimationFrame(renderFrame);
-    setTimeout(initPanelHover, 200);
+    // Animate scene 1 text in via GSAP
+    if(typeof gsap !== 'undefined'){
+      gsap.from('.cin-entry-label',{opacity:0,y:20,duration:1,delay:.2,ease:'power2.out'});
+      gsap.from('.cin-title-line', {opacity:0,y:30,duration:1,delay:.4,stagger:.12,ease:'power3.out'});
+      gsap.from('.cin-entry-sub',  {opacity:0,y:20,duration:1,delay:.8,ease:'power2.out'});
+      gsap.from('.cin-entry-cta',  {opacity:0,y:18,duration:1,delay:1.0,ease:'power2.out'});
+      gsap.from('.cin-entry-scroll-hint',{opacity:0,duration:.8,delay:1.4});
+      gsap.from('.cin-float-card', {opacity:0,x:40,rotationY:20,stagger:.12,duration:.9,delay:1.0,ease:'power3.out',transformPerspective:600});
+    }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  document.readyState==='loading'
+    ? document.addEventListener('DOMContentLoaded',init)
+    : init();
 
 })();
