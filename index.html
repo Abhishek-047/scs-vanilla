@@ -9,7 +9,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
 
   <!-- Cinematic CSS (main) -->
   <link rel="stylesheet" href="assets/css/cinematic.css">
@@ -20,27 +20,27 @@
 
 <body class="cinematic-page">
 
-  <!-- ══ CUSTOM CURSOR ══════════════════════════════════════════ -->
+  <!-- ══ CUSTOM CURSOR ═══════════════════════════════════════ -->
   <div id="cin-cursor-dot"></div>
   <div id="cin-cursor-ring"></div>
 
-  <!-- ══ FLOATING NAVBAR ════════════════════════════════════════ -->
+  <!-- ══ FLOATING NAVBAR ══════════════════════════════════════ -->
   <nav class="cin-navbar" id="cin-navbar">
     <a href="index.html" class="cin-nav-logo">SCS</a>
     <div class="cin-nav-links">
-      <a href="index.html"    class="cin-nav-link active">Home</a>
-      <a href="team.html"     class="cin-nav-link">Team</a>
-      <a href="projects.html" class="cin-nav-link">Projects</a>
-      <a href="events.html"   class="cin-nav-link">Events</a>
-      <a href="resources.html"class="cin-nav-link">Resources</a>
-      <a href="join.html"     class="cin-nav-link">Join</a>
+      <a href="index.html"     class="cin-nav-link active">Home</a>
+      <a href="team.html"      class="cin-nav-link">Team</a>
+      <a href="projects.html"  class="cin-nav-link">Projects</a>
+      <a href="events.html"    class="cin-nav-link">Events</a>
+      <a href="resources.html" class="cin-nav-link">Resources</a>
+      <a href="join.html"      class="cin-nav-link">Join</a>
     </div>
     <div class="cin-nav-hamburger">
       <span></span><span></span><span></span>
     </div>
   </nav>
 
-  <!-- ══ SCENE PROGRESS INDICATOR ══════════════════════════════ -->
+  <!-- ══ SCENE PROGRESS INDICATOR ════════════════════════════ -->
   <div class="cin-progress" id="cin-progress" aria-hidden="true">
     <div class="cin-progress-dot active" data-label="ENTRY"    title="Scene 1 — Entry"></div>
     <div class="cin-progress-line"></div>
@@ -52,11 +52,15 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
-       MAIN SCROLL CONTAINER  — 500vh
-       Everything below is sticky (height 100vh)
+       MAIN SCROLL CONTAINER — 500vh
        ══════════════════════════════════════════════════════════ -->
   <div class="cin-scroll-container" id="cin-scroll">
     <div class="cin-sticky">
+
+      <!-- ═══════════════════════════════════════════════════════
+           THREE.JS BACKGROUND CANVAS
+           ═══════════════════════════════════════════════════════ -->
+      <canvas id="cin-bg-canvas" aria-hidden="true"></canvas>
 
       <!-- ═══════════════════════════════════════════════════════
            LAYER 1 — BACKGROUND: SPLINE 3D ROOM
@@ -76,8 +80,11 @@
       <!-- Vignette overlay on room -->
       <div class="cin-room-vignette"></div>
 
+      <!-- 3D PERSPECTIVE GRID FLOOR (scene 2) -->
+      <div class="cin-3d-grid" aria-hidden="true"></div>
+
       <!-- ═══════════════════════════════════════════════════════
-           LAYER 2 — MID: SPLINE 3D GLOBE
+           LAYER 2 — SPLINE 3D GLOBE + ORBITS
            ═══════════════════════════════════════════════════════ -->
       <div class="cin-spline-globe" id="cin-globe">
         <div class="cin-globe-glow"></div>
@@ -90,10 +97,15 @@
           loading="lazy"
         ></iframe>
       </div>
+      <!-- Orbit decorations around the globe -->
+      <div class="cin-globe-orbit" aria-hidden="true">
+        <div class="cin-globe-orbit-ring"></div>
+        <div class="cin-globe-orbit-ring"></div>
+        <div class="cin-globe-orbit-dot"></div>
+      </div>
 
       <!-- ═══════════════════════════════════════════════════════
            SCENE 1 — ENTRY (0% → 25%)
-           Full dark room, cinematic intro text
            ═══════════════════════════════════════════════════════ -->
       <section class="cin-scene1" id="cin-s1" aria-label="Entry scene">
 
@@ -113,35 +125,9 @@
           study real malware, and turn curiosity into real-world capability.
         </p>
 
-        <div style="display:flex; gap:16px; margin-bottom:48px; flex-wrap:wrap;">
-          <a href="join.html" style="
-            font-family: var(--font-mono);
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--black);
-            background: var(--acid);
-            border: none;
-            padding: 14px 28px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: var(--glow-acid);
-          ">Join SCS</a>
-          <a href="terminal.html" style="
-            font-family: var(--font-mono);
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--acid);
-            background: transparent;
-            border: 1px solid rgba(200,255,0,0.3);
-            padding: 14px 28px;
-            border-radius: 4px;
-            text-decoration: none;
-            transition: all 0.2s ease;
-          ">Terminal Access</a>
+        <div class="cin-entry-cta">
+          <a href="join.html" class="cin-btn-primary" id="cta-join">Join SCS</a>
+          <a href="terminal.html" class="cin-btn-ghost" id="cta-terminal">Terminal Access</a>
         </div>
 
         <div class="cin-entry-scroll-hint">
@@ -151,7 +137,37 @@
 
       </section>
 
-      <!-- Mini stat cards (bottom, scene 1) -->
+      <!-- Right-side floating 3D stat cards (scene 1) -->
+      <div class="cin-s1-right" aria-hidden="true">
+        <div class="cin-s1-float-card" style="--card-delay:0s">
+          <div class="cin-s1-card-label">Members</div>
+          <div class="cin-s1-card-val">120+</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:3px;">Active this semester</div>
+          <div class="cin-s1-card-bar">
+            <div class="cin-s1-card-bar-fill" style="width:80%"></div>
+          </div>
+        </div>
+
+        <div class="cin-s1-float-card" style="--card-delay:0.15s">
+          <div class="cin-s1-card-label">CTFs Won</div>
+          <div class="cin-s1-card-val">34</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:3px;">Regional &amp; national</div>
+          <div class="cin-s1-card-bar">
+            <div class="cin-s1-card-bar-fill" style="width:68%"></div>
+          </div>
+        </div>
+
+        <div class="cin-s1-float-card" style="--card-delay:0.3s">
+          <div class="cin-s1-card-label">Projects Open</div>
+          <div class="cin-s1-card-val">18</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:3px;">Research &amp; tools</div>
+          <div class="cin-s1-card-bar">
+            <div class="cin-s1-card-bar-fill" style="width:55%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini stat cards bottom (scene 1, legacy) -->
       <div class="cin-hero-mini-cards" id="cin-mini-cards" aria-hidden="true">
         <div class="cin-mini-card" style="--card-delay:0.3s">
           <div class="cin-mini-card-label">Members</div>
@@ -193,7 +209,7 @@
 
       <!-- ═══════════════════════════════════════════════════════
            SCENE 3 — MONITOR / HOLOGRAPHIC UI (50% → 75%)
-           Three floating glassmorphism panels
+           Three floating glassmorphism 3D panels
            ═══════════════════════════════════════════════════════ -->
       <div class="cin-holo-panels" id="cin-s3" aria-label="Holographic monitor panels">
 
@@ -233,7 +249,7 @@
           </div>
         </article>
 
-        <!-- Panel 2 — System Info -->
+        <!-- Panel 2 — System Status -->
         <article class="cin-holo-panel" style="--panel-delay:0.15s; --panel-base-y:-6px;">
           <div class="panel-scan"></div>
 
@@ -267,9 +283,8 @@
               <div class="panel-bar-fill" style="--bar-delay:0.4s; width:95%;"></div>
             </div>
 
-            <!-- Hex grid — node map -->
+            <!-- Hex node grid -->
             <div class="panel-hex-grid" style="margin-top:14px;">
-              <!-- 15 cells, some active -->
               <div class="panel-hex active" style="--hex-i:0">●</div>
               <div class="panel-hex active" style="--hex-i:1">●</div>
               <div class="panel-hex"        style="--hex-i:2">○</div>
@@ -289,7 +304,7 @@
           </div>
         </article>
 
-        <!-- Panel 3 — Network Data -->
+        <!-- Panel 3 — Network Feed -->
         <article class="cin-holo-panel" style="--panel-delay:0.3s; --panel-base-y:4px;">
           <div class="panel-scan"></div>
 
@@ -354,12 +369,11 @@
 
       <!-- ═══════════════════════════════════════════════════════
            SCENE 4 — TERMINAL (75% → 100%)
-           Full-screen overlay
            ═══════════════════════════════════════════════════════ -->
       <div class="cin-terminal-overlay" id="cin-term" aria-label="SCS Terminal">
 
         <!-- Matrix rain canvas -->
-        <canvas id="cin-matrix"></canvas>
+        <canvas id="cin-matrix" aria-hidden="true"></canvas>
 
         <!-- Terminal window -->
         <div class="cin-terminal-window">
@@ -392,7 +406,7 @@
 ║   ███████║╚██████╗███████║                                   ║
 ║   ╚══════╝ ╚═════╝╚══════╝                                   ║
 ║                                                              ║
-║   :: Society of Cyber Security ::  Terminal v3.0.0           ║
+║   :: Society of Cyber Security ::  Terminal v4.0.0           ║
 ║   :: Ethical Hacking · CTF · Research · Red/Blue Team ::     ║
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝</div>
@@ -423,7 +437,7 @@
               type="text"
               id="cin-term-input"
               class="cin-term-input"
-              placeholder='Type a command or press a button below…'
+              placeholder="Type a command or press a button below…"
               autocomplete="off"
               spellcheck="false"
               aria-label="Terminal input"
@@ -432,15 +446,18 @@
 
           <!-- Quick command buttons -->
           <div class="cin-term-quickbar">
-            <button class="cin-quick-btn" data-cmd="help"   aria-label="help">help</button>
-            <button class="cin-quick-btn" data-cmd="whoami" aria-label="whoami">whoami</button>
-            <button class="cin-quick-btn" data-cmd="ls"     aria-label="ls">ls</button>
-            <button class="cin-quick-btn" data-cmd="status" aria-label="status">status</button>
-            <button class="cin-quick-btn" data-cmd="nmap"   aria-label="nmap">nmap</button>
-            <button class="cin-quick-btn" data-cmd="hack"   aria-label="hack">hack</button>
-            <button class="cin-quick-btn" data-cmd="ctf"    aria-label="ctf">ctf</button>
-            <button class="cin-quick-btn" data-cmd="join"   aria-label="join">join</button>
-            <button class="cin-quick-btn" data-cmd="clear"  aria-label="clear">clear</button>
+            <button class="cin-quick-btn" data-cmd="help"     aria-label="help">help</button>
+            <button class="cin-quick-btn" data-cmd="whoami"   aria-label="whoami">whoami</button>
+            <button class="cin-quick-btn" data-cmd="ls"       aria-label="ls">ls</button>
+            <button class="cin-quick-btn" data-cmd="status"   aria-label="status">status</button>
+            <button class="cin-quick-btn" data-cmd="nmap"     aria-label="nmap">nmap</button>
+            <button class="cin-quick-btn" data-cmd="scan"     aria-label="scan">scan</button>
+            <button class="cin-quick-btn" data-cmd="hack"     aria-label="hack">hack</button>
+            <button class="cin-quick-btn" data-cmd="decrypt"  aria-label="decrypt">decrypt</button>
+            <button class="cin-quick-btn" data-cmd="ctf"      aria-label="ctf">ctf</button>
+            <button class="cin-quick-btn" data-cmd="projects" aria-label="projects">projects</button>
+            <button class="cin-quick-btn" data-cmd="join"     aria-label="join">join</button>
+            <button class="cin-quick-btn" data-cmd="clear"    aria-label="clear">clear</button>
           </div>
 
           <!-- Status bar -->
@@ -450,13 +467,13 @@
                 <span class="cin-status-dot"></span>
                 Connected
               </span>
-              <span style="opacity:0.3">|</span>
+              <span style="opacity:0.25">|</span>
               <span id="cin-clock">--:--:--</span>
             </div>
             <div style="display:flex;align-items:center;gap:12px;">
               <span style="color:rgba(200,255,0,0.5)">guest</span>
-              <span style="opacity:0.3">|</span>
-              <span>SCS Terminal v3.0.0</span>
+              <span style="opacity:0.25">|</span>
+              <span>SCS Terminal v4.0.0</span>
             </div>
           </div>
 
@@ -467,9 +484,8 @@
   </div><!-- /.cin-scroll-container -->
 
 
-  <!-- ══ SCRIPTS ════════════════════════════════════════════════ -->
-
-  <!-- Cinematic engine (self-contained, no Three.js needed) -->
+  <!-- ══ SCRIPTS ═══════════════════════════════════════════════ -->
+  <!-- Cinematic engine (loads Three.js dynamically) -->
   <script src="assets/js/cinematic.js"></script>
 
 </body>
